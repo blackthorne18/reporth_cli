@@ -16,6 +16,7 @@ The tool can be run with the command:
   |fsize|length of the flanking region to consider, default = 1000|
   |pident|percentage sequence similarity that needs to be met, default= 90%|
   |coverage|minimum length of sequence that has to align/match, default = 90%|
+  <br>
   **Note**: Each tag in the command begins with two '-' dash characters followed by a space and then the argument (see example above)
 
 ## Input Format
@@ -36,15 +37,15 @@ chlTAMOak81 1008421 1008530 green AGCTATCGTAC.......GTACGATAGCT </li>
 ## Output Format
 The output file is very similar to the input file with the addition of a number at the beginning of the link representing the cluster number.
 
-> num genome_name repin_start repin_end repin_type repin_sequence
+> num genome_name repin_start repin_end repin_type repin_sequence<br>
 > 0 chlTAMOak81 1008421 1008530 green AGCTATCGTAC.......GTACGATAGCT
 
 Implying that this particular REPIN belongs to cluster number 0 and so on.
 
 ## Python packages used
-**Biopython**
-Cock, P. J., Antao, T., Chang, J. T., Chapman, B. A., Cox, C. J., Dalke, A., … others. (2009). Biopython: freely available Python tools for computational molecular biology and bioinformatics. _Bioinformatics_, _25_(11), 1422–1423.
-**Pickle**
-Van Rossum, G. (2020). _The Python Library Reference, release 3.8.2_. Python Software Foundation.
-**Networkx**
-Hagberg, A., Swart, P., & S Chult, D. (2008). _Exploring network structure, dynamics, and function using NetworkX_.
+<br>**Biopython**
+<br>Cock, P. J., Antao, T., Chang, J. T., Chapman, B. A., Cox, C. J., Dalke, A., … others. (2009). Biopython: freely available Python tools for computational molecular biology and bioinformatics. _Bioinformatics_, _25_(11), 1422–1423.
+<br>**Pickle**
+<br>Van Rossum, G. (2020). _The Python Library Reference, release 3.8.2_. Python Software Foundation.
+<br>**Networkx**
+<br>Hagberg, A., Swart, P., & S Chult, D. (2008). _Exploring network structure, dynamics, and function using NetworkX_.
