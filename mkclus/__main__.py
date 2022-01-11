@@ -37,7 +37,7 @@ def main(repin, genomes, out, win, fsize, pident, coverage):
     all_parameters = {
         "repin": os.path.abspath(repin),
         "genomes": os.path.abspath(genomes),
-        "out": out,
+        "out": os.path.abspath(out),
         "win": win,
         "fsize": fsize,
         "pident": pident,

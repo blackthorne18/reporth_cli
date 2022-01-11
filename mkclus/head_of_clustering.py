@@ -243,7 +243,9 @@ def flankclusterer():
 
 
 def print_out_clusters():
-    outfile = open(all_parameters['out'], "w")
+    if not os.path.isdir(all_parameters['out']):
+        os.system("mkdir {}".format(all_parameters['out']))
+    outfile = open(all_parameters['out'] + f"/clusters_{todaysdate}.txt", "w")
     for i in range(len(clusters)):
         for rep in clusters[i]:
             a = repins_with_1k_flanks[rep][0]
