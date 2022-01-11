@@ -12,7 +12,7 @@ setup(
     description='Cluster DNA Sequences based on orthology',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url='<github url where the tool code will remain>',
+    url='https://github.com/blackthorne18/repinclusterer_cli',
     py_modules=['mkclus'],
     packages=find_packages(),
     install_requires=[requirements],
