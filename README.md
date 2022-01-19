@@ -1,5 +1,10 @@
 # REPIN CLUSTERER
 
+## Installation
+The tool can be installed with the command:
+
+    pip install repinclusterer
+
 ## Introduction
 repin_clusterer is a tool developed for the clustering of REPIN sequences based on their position in the genome. REPIN Sequences that are present in orthologous regions will be placed in the same cluster. The orthology is determined based on the similarity of the nucleotide sequence that flanks either side of the REPIN.
 

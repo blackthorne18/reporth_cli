@@ -6,7 +6,6 @@ file_path = os.path.realpath(__file__)
 file_path = os.path.relpath(file_path, os.getcwd())
 file_path = "./" + file_path.split("/")[0]
 os.chdir(file_path)
-print(os.getcwd())
 import head_of_clustering
 
 
