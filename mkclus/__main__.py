@@ -1,8 +1,13 @@
 import click
 import os
 from Bio import SeqIO
-import head_of_clustering
 import pickle
+file_path = os.path.realpath(__file__)
+file_path = os.path.relpath(file_path, os.getcwd())
+file_path = "./" + file_path.split("/")[0]
+os.chdir(file_path)
+print(os.getcwd())
+import head_of_clustering
 
 
 def quick_check_files(repin, genomes):
@@ -44,10 +49,6 @@ def main(repin, genomes, out, win, fsize, pident, coverage):
         "coverage": coverage
     }
     quick_check_files(all_parameters['repin'], all_parameters['genomes'])
-    file_path = os.path.realpath(__file__)
-    file_path = os.path.relpath(file_path, os.getcwd())
-    file_path = "./" + file_path.split("/")[0]
-    os.chdir(file_path)
     pickle.dump(all_parameters, open(
         "./bank/all_parameters.p", "wb"))
     head_of_clustering.main()
