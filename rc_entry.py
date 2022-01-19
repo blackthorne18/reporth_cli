@@ -2,7 +2,6 @@ import click
 import os
 from Bio import SeqIO
 import pickle
-import head_of_clustering
 
 
 def quick_check_files(repin, genomes):
@@ -46,7 +45,7 @@ def main(repin, genomes, out, win, fsize, pident, coverage):
     quick_check_files(all_parameters['repin'], all_parameters['genomes'])
     pickle.dump(all_parameters, open(
         "./bank/all_parameters.p", "wb"))
-    head_of_clustering.main()
+    os.system("python3 mkclus/")
 
 
 if __name__ == '__main__':

@@ -43,11 +43,13 @@ flankclusterer(clusters)
 import os
 import time
 import pickle
-import prepare_datasets
 import networkx as nx
 from copy import deepcopy
 from itertools import combinations as itercomb
 # import numpy as np
+filepath = "/".join(__file__.split("/")[:-1])
+os.chdir(filepath)
+import prepare_datasets
 
 todaysdate = time.strftime("%b%d")
 genome_blastdb = "./bank/genomes_blastdb/allgenomes"

@@ -13,7 +13,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='https://github.com/blackthorne18/repinclusterer_cli',
-    py_modules=['rc_entry','mkclus'],
+    py_modules=['rc_entry', 'mkclus'],
     packages=find_packages(),
     install_requires=[requirements],
     python_requires='>=3.7',
