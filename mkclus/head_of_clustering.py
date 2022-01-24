@@ -257,18 +257,10 @@ def print_out_clusters():
     outfile.close()
 
 
-def rmcleanup():
-    os.system("rm -rf {}".format("./bank/"))
-    os.system("mkdir {}".format("./bank/"))
-    os.system("mkdir {}".format("./bank/dumpyard"))
-    os.system("mkdir {}".format("./bank/genomes_blastdb"))
-
-
 def main():
     setup()
     flankclusterer()
     print_out_clusters()
-    rmcleanup()
 
 
 if __name__ == "__main__":
