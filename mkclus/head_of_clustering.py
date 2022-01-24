@@ -49,7 +49,7 @@ from itertools import combinations as itercomb
 # import numpy as np
 filepath = "/".join(__file__.split("/")[:-1])
 os.chdir(filepath)
-import prepare_datasets
+from mkclus import prepare_datasets
 
 todaysdate = time.strftime("%b%d")
 genome_blastdb = "./bank/genomes_blastdb/allgenomes"
@@ -123,7 +123,8 @@ def setup_flank_matches():
     mixed_clusters = []
     switch_dir = {'left': 'R', 'right': 'L'}
     for key in repins_with_1k_flanks.keys():
-        print("Setting up match", int(len(mixed_clusters) / 2))
+        print("Setting up match", int(len(mixed_clusters) / 2),
+              "of", len(list(repins_with_1k_flanks.keys())))
         repin = repins_with_1k_flanks[key]
         lhs = repin[2]
         lhs_hits = prepare_datasets.search_blastdb(lhs, flank_gene_param)
