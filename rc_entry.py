@@ -28,7 +28,7 @@ def quick_check_files(repin, genomes):
 @click.command()
 @click.option('--repin', prompt="Repin File", help='Path to file containing repin sequences')
 @click.option('--genomes', prompt="Genomes Directory", help='Path to directory containing genomes')
-@click.option('--out', help="Output file destination", default='./cluster_output/')
+@click.option('--out', help="Output file destination", default='../cluster_output/')
 @click.option('--win', help="Repin flanking window", default=250)
 @click.option('--fsize', help="Size of flanking region", default=1000)
 @click.option('--pident', help="Percentage sequence similarity", default=90)
@@ -43,6 +43,9 @@ def main(repin, genomes, out, win, fsize, pident, coverage):
         "pident": pident,
         "coverage": coverage
     }
+    print(os.getcwd())
+    print(repin, genomes, out, "\n", all_parameters)
+    exit()
     quick_check_files(all_parameters['repin'], all_parameters['genomes'])
     os.system("mkdir {}".format("./bank/"))
     os.system("mkdir {}".format("./bank/dumpyard"))
