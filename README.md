@@ -8,25 +8,38 @@ The tool can be installed with the command:
 ## Introduction
 repin_clusterer is a tool developed for the clustering of REPIN sequences based on their position in the genome. REPIN Sequences that are present in orthologous regions will be placed in the same cluster. The orthology is determined based on the similarity of the nucleotide sequence that flanks either side of the REPIN.
 
-![rocess of REPIN Clustering](./readme_images/repin_process.jpeg)
+![Process of REPIN Clustering](./readme_images/repin_process.jpeg)
 
 ## Using this tool
 The tool can be run with the command:
 
-    repinclusterer --repin all_repins.txt --genomes genomes/ -out output_dir
-  | Tag      |      Function      |
-|:------------:|:-------------:|
-  |repin|path to the text file containing REPIN sequences|
-  |genomes|path to the directory containing all the genome sequences|
-  |out|path to where the output file should be stored|
-  |win|begin flanking region after, default  = 250. This means that if the REPIN starts at 'x' and ends at 'y', the flanking region will begin at 'x-250' and from 'y+250'|
-  |fsize|length of the flanking region to consider, default = 1000|
-  |pident|percentage sequence similarity that needs to be met, default= 90%|
-  |coverage|minimum length of sequence that has to align/match, default = 90%|
+    repinclusterer --repin all_repins.txt --genomes genomes/ --out output_dir
+  | Tag      |      Function      |      Default      |
+|:------------:|:-------------:|:-------------:|
+  |repin|path to the text file containing REPIN sequences| None|
+  |genomes|path to the directory containing all the genome sequences| None|
+  |out|path to where the output file should be stored| ./cluster_output|
+  |win|begin flanking region after. This means that if the REPIN starts at 'x' and ends at 'y', the flanking region will begin at 'x-250' and from 'y+250'| 250 |
+  |fsize|length of the flanking region to consider|1000|
+  |pident|percentage sequence similarity that needs to be met|90(%)|
+  |coverage|minimum length of sequence that has to align/match|90(%)|
+  |withrarefan|path to directory containing RAREFAN output| None|
   <br>
   **Note**: Each tag in the command begins with two '-' dash characters followed by a space and then the argument (see example above)
 
 ![Clustering Parameters](./readme_images/repin_flank.png)
+
+## Example Dataset
+We have created an example dataset for you to understand how to use the software and for a demonstration.<br>
+Download the sample input dataset from <a id="raw-url" href="https://raw.githubusercontent.com/github-username/repinclusterer_cli/master/readme_images/test_data">Test Data</a>
+. Install `repinclusterer` and run using the command as mentioned above. The output will be stored in the `cluster_output` directory in the format as mentioned below.
+
+
+## Running along with RAREFAN
+If you have identified REPINs from RAREFAN, you can also provide the output folder from RAREFAN as the input and `repinclusterer` will take care of the rest. There wouldn't be a need to create the input files yourself according to the required format.
+Use the `--withrarefan` tag and run as:<br>
+> repinclusterer --withrarefan rarefan_output_dir
+
 
 ## Input Format
 The input files that are required are by software:
@@ -38,16 +51,15 @@ The input files that are required are by software:
 <li> If there are REPINs whose genome sequence files are not provided, those REPINs will be dropped from the analysis</li>
 <li>The file containing REPIN sequences should be formatted such that each line contains (only) the following information:<br>
 genome_name repin_start repin_end repin_type repin_sequence
-<br>Ex:<br>
-chlTAMOak81 1008421 1008530 green AGCTATCGTAC.......GTACGATAGCT </li>
+<br>Ex: chlTAMOak81 1008421 1008530 type0 </li>
 <li>It is preferrable to provide the genome sequences in fasta format. </li>
 </ol>
 
 ## Output Format
 The output file is very similar to the input file with the addition of a number at the beginning of the link representing the cluster number.
 
-> num genome_name repin_start repin_end repin_type repin_sequence<br>
-> 0 chlTAMOak81 1008421 1008530 green AGCTATCGTAC.......GTACGATAGCT
+> num genome_name repin_start repin_end repin_type<br>
+> 0 chlTAMOak81 1008421 1008530 type0
 
 Implying that this particular REPIN belongs to cluster number 0 and so on.
 
