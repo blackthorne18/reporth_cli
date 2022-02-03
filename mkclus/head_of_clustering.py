@@ -134,8 +134,6 @@ def setup_flank_matches():
     mixed_clusters = []
     switch_dir = {'left': 'R', 'right': 'L'}
     for key in repins_with_1k_flanks.keys():
-        print("Setting up match", int(len(mixed_clusters) / 2),
-              "of", len(list(repins_with_1k_flanks.keys())))
         progress_bar(int(len(mixed_clusters) / 2) + 1, allreplength * 1.1)
         repin = repins_with_1k_flanks[key]
         lhs = repin[2]

@@ -19,7 +19,7 @@ def get_files_from_rarefan(rarefan_path):
         for rep in repins:
             rep = rep.split("_")
             newr = "{} {} {} type{} {}".format(
-                gen, rep[1], rep[2], rep[0], "N" * 20)
+                gen.split("_0")[0], rep[1], rep[2], rep[0], "N" * 20)
             allrepins.append(newr)
 
     allrepins = "\n".join(allrepins)
