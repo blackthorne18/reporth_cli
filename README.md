@@ -16,14 +16,14 @@ The tool can be run with the command:
     repinclusterer --repin all_repins.txt --genomes genomes/ --out output_dir
   | Tag      |      Function      |      Default      |
 |:------------:|:-------------:|:-------------:|
-  |repin|path to the text file containing REPIN sequences| None|
+  |repin|path to the text file containing REPIN sequences or RAREFAN Dir| None|
   |genomes|path to the directory containing all the genome sequences| None|
   |out|path to where the output file should be stored| ./cluster_output|
   |win|begin flanking region after. This means that if the REPIN starts at 'x' and ends at 'y', the flanking region will begin at 'x-250' and from 'y+250'| 250 |
   |fsize|length of the flanking region to consider|1000|
   |pident|percentage sequence similarity that needs to be met|90(%)|
   |coverage|minimum length of sequence that has to align/match|90(%)|
-  |withrarefan|path to directory containing RAREFAN output| None|
+  |withrarefan|Using RAREFAN as input? 1 for yes, 0 for no| 0|
   <br>
   **Note**: Each tag in the command begins with two '-' dash characters followed by a space and then the argument (see example above)
 
@@ -38,7 +38,7 @@ Download the sample input dataset from [this link](https://download-directory.gi
 ## Running along with RAREFAN
 If you have identified REPINs from RAREFAN, you can also provide the output folder from RAREFAN as the input and `repinclusterer` will take care of the rest. There wouldn't be a need to create the input files yourself according to the required format.
 Use the `--withrarefan` tag and run as:<br>
-> repinclusterer --withrarefan rarefan_output_dir
+> repinclusterer --repin rarefan_output_dir --genomes genomes/ --withrarefan 1
 
 
 ## Input Format

@@ -66,6 +66,17 @@ closest_repin_criteria = 500
 fast_mode_testin_only = False
 all_parameters = {}
 flank_gene_param = {}
+allreplength = []
+
+
+def progress_bar(current, total, bar_length=70):
+    percent = float(current) * 100 / total
+    arrow = '#' * int(percent / 100 * bar_length - 1)
+    spaces = ' ' * (bar_length - len(arrow))
+    if current == total:
+        print('Progress: [%s%s] %d %%' % (arrow, spaces, percent))
+    else:
+        print('Progress: [%s%s] %d %%' % (arrow, spaces, percent), end='\r')
 
 
 def prepare_repin_dict(mixed_clusters):
@@ -125,6 +136,7 @@ def setup_flank_matches():
     for key in repins_with_1k_flanks.keys():
         print("Setting up match", int(len(mixed_clusters) / 2),
               "of", len(list(repins_with_1k_flanks.keys())))
+        progress_bar(int(len(mixed_clusters) / 2) + 1, allreplength * 1.1)
         repin = repins_with_1k_flanks[key]
         lhs = repin[2]
         lhs_hits = prepare_datasets.search_blastdb(lhs, flank_gene_param)
@@ -162,6 +174,7 @@ def setup_flank_matches():
 def setup():
     global repins_with_1k_flanks, clusters, repin_names, repins_per_genome
     global all_parameters, genomes_list, flank_gene_param
+    global allreplength
 
     all_parameters = pickle.load(open("./bank/all_parameters.p", "rb"))
     genomes_list = [gen[:-4]
@@ -179,6 +192,7 @@ def setup():
         gen = key.split(" ")[0]
         repins_per_genome[gen].append(key)
 
+    allreplength = len(list(repins_with_1k_flanks.keys()))
     if not fast_mode_testin_only:
         setup_flank_matches()
     else:
@@ -189,6 +203,7 @@ def setup():
 
 def flankclusterer():
     global clusters
+    progress_bar(allreplength * 1.05, allreplength * 1.1)
     # ---------------------Block Starts---------------------
     # Finding Middle Gene Deletion Cases
     flank_gene_pair = []
@@ -246,6 +261,7 @@ def flankclusterer():
 
 
 def print_out_clusters():
+    progress_bar(allreplength * 1.1, allreplength * 1.1)
     if not os.path.isdir(all_parameters['out']):
         os.system("mkdir {}".format(all_parameters['out']))
     outfile = open(all_parameters['out'] + f"/clusters_{todaysdate}.txt", "w")
