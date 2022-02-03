@@ -31,7 +31,7 @@ The tool can be run with the command:
 
 ## Example Dataset
 We have created an example dataset for you to understand how to use the software and for a demonstration.<br>
-Download the sample input dataset from <a id="raw-url" href="https://raw.githubusercontent.com/github-username/repinclusterer_cli/master/readme_images/test_data">Test Data</a>
+Download the sample input dataset from <a href="./readme_images/test_data">Test Data</a>
 . Install `repinclusterer` and run using the command as mentioned above. The output will be stored in the `cluster_output` directory in the format as mentioned below.
 
 
