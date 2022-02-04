@@ -1,9 +1,6 @@
 # Mac Specific
 .DS_Store
 
-# Project specific
-readme_images/test_data/
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
