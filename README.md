@@ -1,5 +1,16 @@
 # REPIN CLUSTERER
 
+## List of Contents
+
+- [Installation](##installation)
+- [Introduction](#introduction)
+- [Using this tool](#using-this-tool)
+- [Example Dataset](#example-dataset)
+- [Running along with RAREFAN](#running-along-with-rarefan)
+- [Input Format](#input-format)
+- [Output Format](#output-format)
+- [Python packages used](##python-packages-used)
+
 ## Installation
 The tool can be installed with the command:
 
