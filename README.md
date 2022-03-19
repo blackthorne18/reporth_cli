@@ -31,9 +31,11 @@ The tool can be run with the command:
 ![Clustering Parameters](./readme_images/repin_flank.png)
 
 ## Example Dataset
-We have created an example dataset for you to understand how to use the software and for a demonstration.<br>
-Download the sample input dataset from the assets folder of the latest release. Install `repinclusterer` and run using the command as mentioned above. The output will be stored in the `cluster_output` directory in the format as mentioned below.
-
+We have created an example dataset for you to understand how to use the software and for a demonstration.
+<br>Download the sample input dataset from the link below.
+<br>Install `repinclusterer` and run using the command as mentioned above.
+<br>The output will be stored in the `cluster_output` directory in the format as mentioned below.
+<br>[Download Test Dataset](https://github.com/blackthorne18/repinclusterer_cli/files/8309764/test_data.zip)
 
 ## Running along with RAREFAN
 If you have identified REPINs from RAREFAN, you can also provide the output folder from RAREFAN as the input and `repinclusterer` will take care of the rest. There wouldn't be a need to create the input files yourself according to the required format.
