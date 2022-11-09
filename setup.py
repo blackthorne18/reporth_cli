@@ -7,7 +7,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name='repinclusterer',
-    version='0.2.4',
+    version='0.2.5',
     author='Prajwal Bharadwaj',
     description='Cluster DNA Sequences based on orthology',
     long_description=long_description,
