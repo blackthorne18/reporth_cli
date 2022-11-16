@@ -42,9 +42,8 @@ all_parameters_path = "./bank/all_parameters.p"
 
 def setup_blastdb():
     all_parameters = pickle.load(open(all_parameters_path, "rb"))
-    genomes_path = all_parameters['genomes']
-    genomes_list = next(
-        os.walk(genomes_path), (None, None, []))[2]
+    genomes_list = all_parameters['genomes']
+
     repins = open(all_parameters['repin'], "r").read().split("\n")
 
     flank_gene_range = {
@@ -53,7 +52,8 @@ def setup_blastdb():
 
     genome_sequences = []
     repin_with_1k_flanks = {}
-    repin_per_genome = {genome[:-4]: [] for genome in genomes_list}
+    repin_per_genome = {genome.split("/")[-1].split(".")[0]: []
+                        for genome in genomes_list}
 
     for rep in repins:
         gen = rep.split(" ")[0]
@@ -65,8 +65,9 @@ def setup_blastdb():
         repin_per_genome[gen].append(rep)
 
     for genome in genomes_list:
-        sequence = str(SeqIO.read(genomes_path + "/" + genome, "fasta").seq)
-        for rep in repin_per_genome[genome[:-4]]:
+        sequence = str(SeqIO.read(genome, "fasta").seq)
+        genname = genome.split("/")[-1].split(".")[0]
+        for rep in repin_per_genome[genname]:
             left_flank = sequence[rep[1] -
                                   fgr: rep[1] - flank_gene_range['window']]
             right_flank = sequence[rep[2] +
@@ -76,7 +77,7 @@ def setup_blastdb():
                 repname, rep[3], left_flank, rep[4], right_flank]
 
         genome_sequences.append(">{}\n{}".format(
-            genome.split(".")[0], sequence))
+            genname, sequence))
 
     pickle.dump(repin_with_1k_flanks, open(
         "./bank/repin_with_1k_flanks.p", "wb"))

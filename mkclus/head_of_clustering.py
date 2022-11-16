@@ -175,8 +175,8 @@ def setup():
     global allreplength
 
     all_parameters = pickle.load(open("./bank/all_parameters.p", "rb"))
-    genomes_list = [gen[:-4]
-                    for gen in next(os.walk(all_parameters['genomes']), (None, None, []))[2]]
+
+    genomes_list = all_parameters['genomes']
     flank_gene_param = {
         'pident': all_parameters['pident'], 'lengthmatch': all_parameters['coverage']}
 
@@ -185,7 +185,8 @@ def setup():
     repins_with_1k_flanks = pickle.load(open(rw1k_path, "rb"))
     clusters = [key for key in repins_with_1k_flanks.keys()]
     repin_names = [key for key in repins_with_1k_flanks.keys()]
-    repins_per_genome = {gen: [] for gen in genomes_list}
+    repins_per_genome = {
+        gen.split("/")[-1].split(".")[0]: [] for gen in genomes_list}
     for key in clusters:
         gen = key.split(" ")[0]
         repins_per_genome[gen].append(key)
@@ -261,8 +262,8 @@ def flankclusterer():
 def print_out_clusters():
     progress_bar(allreplength * 1.1, allreplength * 1.1)
     if not os.path.isdir(all_parameters['out']):
-        os.system("mkdir {}".format(all_parameters['out']))
-    outfile = open(all_parameters['out'] + f"/clusters_{todaysdate}.txt", "w")
+        os.system("mkdir {}".format(all_parameters['out'].replace(" ", "\ ")))
+    outfile = open(f"{all_parameters['out']}/clusters_{todaysdate}.txt", "w")
     for i in range(len(clusters)):
         for rep in clusters[i]:
             a = repins_with_1k_flanks[rep][0]

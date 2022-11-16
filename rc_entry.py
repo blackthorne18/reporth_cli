@@ -4,6 +4,8 @@ from Bio import SeqIO
 import pickle
 from mkclus import head_of_clustering
 
+all_parameters = {}
+
 
 def get_files_from_rarefan(rarefan_path):
     genomes = []
@@ -41,10 +43,9 @@ def quick_check_files(repin, genomes):
         for gen in gens:
             try:
                 list(SeqIO.parse(genomes + "/" + gen, 'fasta'))[0]
+                all_parameters["genomes"].append(genomes + "/" + gen)
             except Exception:
-                print(f"Error in genome fasta files in {genomes}/{gen}")
-                print("Exiting......")
-                exit()
+                print(f"Ignoring {genomes}/{gen} - Not a fasta file")
 
 
 @click.command()
@@ -57,9 +58,11 @@ def quick_check_files(repin, genomes):
 @click.option('--pident', help="Percentage sequence similarity", default=90)
 @click.option('--coverage', help="Minimum length of alignment", default=90)
 def main(repin, withrarefan, genomes, out, win, fsize, pident, coverage):
+    global all_parameters
+
     all_parameters = {
         "repin": os.path.abspath(repin),
-        "genomes": os.path.abspath(genomes),
+        "genomes": [],
         "out": os.path.abspath(out),
         "win": win,
         "fsize": fsize,
@@ -71,7 +74,7 @@ def main(repin, withrarefan, genomes, out, win, fsize, pident, coverage):
         get_files_from_rarefan(all_parameters['repin'])
         all_parameters['repin'] += "/sortedrepins.txt"
 
-    quick_check_files(all_parameters['repin'], all_parameters['genomes'])
+    quick_check_files(all_parameters['repin'], os.path.abspath(genomes))
     os.system("mkdir {}".format("./bank/"))
     os.system("mkdir {}".format("./bank/dumpyard"))
     os.system("mkdir {}".format("./bank/genomes_blastdb"))
@@ -85,4 +88,9 @@ def main(repin, withrarefan, genomes, out, win, fsize, pident, coverage):
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+        print("Program Completed.")
+    except Exception as e:
+        os.system("rm -rf ./bank")
+        exit(f"repinclusterer encountered an error:\n{e}\nExiting...")
