@@ -7,7 +7,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name='repinclusterer',
-    version='0.2.6',
+    version='0.2.13',
     author='Prajwal Bharadwaj',
     description='Cluster DNA Sequences based on orthology',
     long_description=long_description,
@@ -18,7 +18,7 @@ setup(
     install_requires=[requirements],
     python_requires='>=3.7',
     classifiers=[
-        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.7",
         "Operating System :: OS Independent",
     ],
     entry_points='''
