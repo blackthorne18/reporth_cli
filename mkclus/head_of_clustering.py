@@ -140,7 +140,7 @@ def setup_flank_matches():
         lhs_hits = prepare_datasets.search_blastdb(lhs, flank_gene_param)
         mixed_clusters.append([])
         for hit in lhs_hits:
-            hit[1] = hit[1][:3].lower() + hit[1][3:]
+            # hit[1] = hit[1][:3].lower() + hit[1][3:]
             near_reps = nearby_repins(hit[1], hit[4], hit[5])
             for rep in near_reps:
                 # ------------------------------
@@ -154,7 +154,7 @@ def setup_flank_matches():
         rhs_hits = prepare_datasets.search_blastdb(rhs, flank_gene_param)
         mixed_clusters.append([])
         for hit in rhs_hits:
-            hit[1] = hit[1][:3].lower() + hit[1][3:]
+            # hit[1] = hit[1][:3].lower() + hit[1][3:]
             near_reps = nearby_repins(hit[1], hit[4], hit[5])
             for rep in near_reps:
                 # ------------------------------

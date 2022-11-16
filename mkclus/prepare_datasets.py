@@ -84,10 +84,10 @@ def setup_blastdb():
 
     genome_sequences = "\n".join(genome_sequences)
     open(blast_path + "allgenomes.fas", "w").write(genome_sequences)
-    cmd = f"makeblastdb -in {blast_path}allgenomes.fas -out {blast_path}allgenomes -parse_seqids -dbtype nucl"
+    cmd = f"makeblastdb -in {blast_path}allgenomes.fas -out {blast_path}allgenomes -dbtype nucl"
 
     cline = NcbimakeblastdbCommandline(
-        dbtype="nucl", input_file=blast_path + "allgenomes.fas", out=blast_path + "allgenomes", parse_seqids=True)
+        dbtype="nucl", input_file=blast_path + "allgenomes.fas", out=blast_path + "allgenomes")
 
     # Using BLAST CLI
     # os.system(cmd)
