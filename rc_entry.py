@@ -10,19 +10,30 @@ all_parameters = {}
 def get_files_from_rarefan(rarefan_path):
     genomes = []
     for file in list(os.walk(rarefan_path))[0][1]:
-        if file[len(file) - 2:] == "_0":
+        if "_" in file:
             genomes.append(file)
 
     allrepins = []
     for gen in genomes:
-        repins = open(rarefan_path + "/" + gen + "/" + gen + ".ss").read()
-        repins = [i.split("\t")[1:] for i in repins.split("\n") if len(i) > 0]
-        repins = [j for i in repins for j in i]
-        for rep in repins:
-            rep = rep.split("_")
-            newr = "{} {} {} type{} {}".format(
-                gen.split("_0")[0], rep[1], rep[2], rep[0], "N" * 20)
-            allrepins.append(newr)
+        try:
+            repins = open(rarefan_path + "/" + gen + "/" + gen + ".ss").read()
+        except Exception:
+            continue
+        repins = [i.replace("\t", "\n").split("\n")
+                  for i in repins.split(">") if len(i) > 0]
+        repins = [i[1:] for i in repins]
+        repins = [[j for j in i if len(j) > 0] for i in repins]
+
+        repintype = gen.split("_")[-1]
+
+        for repin in repins:
+            rseq = repin[-1]
+            rname = repin[:-1]
+            for rep in rname:
+                rep = repin[0].split("_")
+                newr = "{} {} {} type{} {}".format(
+                    gen.split("_0")[0], rep[1], rep[2], repintype, rseq)
+                allrepins.append(newr)
 
     allrepins = "\n".join(allrepins)
     open(rarefan_path + "/sortedrepins.txt", "w").write(allrepins)
