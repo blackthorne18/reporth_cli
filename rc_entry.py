@@ -10,7 +10,7 @@ all_parameters = {}
 def get_files_from_rarefan(rarefan_path):
     genomes = []
     for file in list(os.walk(rarefan_path))[0][1]:
-        if "_" in file:
+        if "_" in file and "_0" not in file: 
             genomes.append(file)
 
     allrepins = []
@@ -32,12 +32,11 @@ def get_files_from_rarefan(rarefan_path):
             for rep in rname:
                 rep = repin[0].split("_")
                 newr = "{} {} {} type{} {}".format(
-                    gen.split("_0")[0], rep[1], rep[2], repintype, rseq)
+                    gen.split("_")[0], rep[1], rep[2], repintype, rseq)
                 allrepins.append(newr)
 
     allrepins = "\n".join(allrepins)
     open(rarefan_path + "/sortedrepins.txt", "w").write(allrepins)
-
 
 def quick_check_files(repin, genomes):
     if not os.path.isfile(repin):
