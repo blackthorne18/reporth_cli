@@ -35,7 +35,7 @@ The tool can be run with the command:
   |fsize|length of the flanking region to consider|1000|
   |pident|percentage sequence similarity that needs to be met|90(%)|
   |coverage|minimum length of sequence that has to align/match|90(%)|
-  |withrarefan|Using RAREFAN as input? 1 for yes, 0 for no| 0|
+  |captypes|Caps the number of REPIN types read from Rarefan out| -1|
   <br>
   **Note**: Each tag in the command begins with two '-' dash characters followed by a space and then the argument (see example above)
 
