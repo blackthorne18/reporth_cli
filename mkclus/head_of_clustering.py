@@ -195,7 +195,7 @@ def setup():
     if not fast_mode_testin_only:
         setup_flank_matches()
     else:
-        mixclus_file = "./bank/dumpyard/mixed_clusters_Jan08.p"
+        mixclus_file = f"mixed_clusters_{todaysdate}.p"
         mixed_clusters = pickle.load(open(mixclus_file, "rb"))
         prepare_repin_dict(mixed_clusters)
 
@@ -230,11 +230,15 @@ def flankclusterer():
             if (key1[1], key1[0]) in triad_cliques or (key2[1], key2[0]) in triad_cliques:
                 continue
             if key1[0] == key2[0] and key1[0] != -1:
+                if len(rightclus[key1[1]]) > 1:
+                    continue
                 if len(rightclus[key2[1]]) > 1:
                     continue
                 move_tracker.append([key1, key2])
                 to_merge.append((key1, key2))
             if key1[1] == key2[1] and key1[1] != -1:
+                if len(leftclus[key1[0]]) > 1:
+                    continue
                 if len(leftclus[key2[0]]) > 1:
                     continue
                 move_tracker.append([key1, key2])

@@ -7,7 +7,7 @@ from mkclus import head_of_clustering
 all_parameters = {}
 
 
-def get_files_from_rarefan(rarefan_path, captypes):
+def get_files_from_rarefan(rarefan_path, reptypes):
 
     if os.path.isfile(rarefan_path):
         return rarefan_path
@@ -34,7 +34,7 @@ def get_files_from_rarefan(rarefan_path, captypes):
         genname = gen.split("_")[0]
         repintype = int(gen.split("_")[-1])
 
-        if repintype > captypes and captypes != -1:
+        if repintype != reptypes and reptypes is not None:
             continue
 
         if genname not in remove_repeats.keys():
@@ -98,8 +98,8 @@ def quick_check_files(repin, genomes):
 @click.option('--fsize', help="Size of flanking region", default=1000)
 @click.option('--pident', help="Percentage sequence similarity", default=90)
 @click.option('--coverage', help="Minimum length of alignment", default=90)
-@click.option('--captypes', help="Capping the number of REPIN types considered from RAREFAN output", default=-1)
-def main(repin, genomes, out, win, fsize, pident, coverage, captypes):
+@click.option('--reptypes', help="Mention the specific repin types to accept from rarefan output")
+def main(repin, genomes, out, win, fsize, pident, coverage, reptypes):
     global all_parameters
 
     all_parameters = {
@@ -110,11 +110,11 @@ def main(repin, genomes, out, win, fsize, pident, coverage, captypes):
         "fsize": fsize,
         "pident": pident,
         "coverage": coverage,
-        "captypes": captypes
+        "reptypes": [int(x) for x in reptypes.split(",")]
     }
 
     all_parameters['repin'] = get_files_from_rarefan(
-        all_parameters['repin'], all_parameters['captypes'])
+        all_parameters['repin'], all_parameters['reptypes'])
 
     # Check validity of all files and genome files
     quick_check_files(all_parameters['repin'], os.path.abspath(genomes))

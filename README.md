@@ -25,19 +25,21 @@ repin_clusterer is a tool developed for the clustering of REPIN sequences based 
 ## Using this tool
 The tool can be run with the command:
 
-    repinclusterer --repin all_repins.txt --genomes genomes/ --out output_dir
+    repinclusterer --repin all_repins.txt --genomes genomes/ --out output_dir --reptypes 1,2
   | Tag      |      Function      |      Default      |
 |:------------:|:-------------:|:-------------:|
   |repin|path to the text file containing REPIN sequences or RAREFAN Dir| None|
   |genomes|path to the directory containing all the genome sequences| None|
   |out|path to where the output file should be stored| ./cluster_output|
+  |reptypes|Mention the specific repin types to accept from rarefan output | None|
   |win|begin flanking region after. This means that if the REPIN starts at 'x' and ends at 'y', the flanking region will begin at 'x-250' and from 'y+250'| 250 |
   |fsize|length of the flanking region to consider|1000|
   |pident|percentage sequence similarity that needs to be met|90(%)|
   |coverage|minimum length of sequence that has to align/match|90(%)|
-  |captypes|Caps the number of REPIN types read from Rarefan out| -1|
   <br>
-  **Note**: Each tag in the command begins with two '-' dash characters followed by a space and then the argument (see example above)
+  **Note**:
+  1. Each tag in the command begins with two '-' dash characters followed by a space and then the argument (see example above)
+  2. For --reptypes, the numbers should be written separated by a comma without a space between the values
 
 ![Clustering Parameters](./readme_images/repin_flank.png)
 
