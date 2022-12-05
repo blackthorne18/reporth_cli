@@ -34,7 +34,7 @@ def get_files_from_rarefan(rarefan_path, reptypes):
         genname = gen.split("_")[0]
         repintype = int(gen.split("_")[-1])
 
-        if repintype != reptypes and reptypes is not None:
+        if repintype not in reptypes and reptypes is not None:
             continue
 
         if genname not in remove_repeats.keys():
@@ -87,7 +87,7 @@ def quick_check_files(repin, genomes):
             if gen.split(".")[0] not in existing_in_gens:
                 print(existing_in_gens, gen)
                 exit(
-                    f"Genome fasta file for {gen} not provided but REPINs from {gen} exist")
+                    f"Genome fasta file for {gen} not provided but REPINs from {gen} exist\nExisting Gens: {','.join(existing_in_gens)}")
 
 
 @click.command()
@@ -102,6 +102,9 @@ def quick_check_files(repin, genomes):
 def main(repin, genomes, out, win, fsize, pident, coverage, reptypes):
     global all_parameters
 
+    if reptypes is not None:
+        reptypes = [int(x) for x in reptypes.split(",")]
+
     all_parameters = {
         "repin": os.path.abspath(repin),
         "genomes": [],
@@ -110,7 +113,7 @@ def main(repin, genomes, out, win, fsize, pident, coverage, reptypes):
         "fsize": fsize,
         "pident": pident,
         "coverage": coverage,
-        "reptypes": [int(x) for x in reptypes.split(",")]
+        "reptypes": reptypes
     }
 
     all_parameters['repin'] = get_files_from_rarefan(
