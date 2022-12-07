@@ -73,6 +73,10 @@ def setup_blastdb():
             right_flank = sequence[rep[2] +
                                    flank_gene_range['window']: rep[2] + fgr]
             repname = rep[0] + " " + str(rep[1]) + " " + str(rep[2])
+            if len(left_flank) == 0:
+                left_flank = "N" * 1000
+            if len(right_flank) == 0:
+                right_flank = "N" * 1000
             repin_with_1k_flanks[repname] = [
                 repname, rep[3], left_flank, rep[4], right_flank]
 

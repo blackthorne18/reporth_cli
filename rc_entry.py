@@ -80,14 +80,14 @@ def quick_check_files(repin, genomes):
         for gen in gens:
             try:
                 list(SeqIO.parse(genomes + "/" + gen, 'fasta'))[0]
-                all_parameters["genomes"].append(genomes + "/" + gen)
             except Exception:
                 print(f"Ignoring {genomes}/{gen} - Not a fasta file")
+                continue
 
             if gen.split(".")[0] not in existing_in_gens:
-                print(existing_in_gens, gen)
                 exit(
                     f"Genome fasta file for {gen} not provided but REPINs from {gen} exist\nExisting Gens: {','.join(existing_in_gens)}")
+            all_parameters["genomes"].append(genomes + "/" + gen)
 
 
 @click.command()
