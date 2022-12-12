@@ -60,13 +60,14 @@ repins_with_1k_flanks = {}
 clusters = []
 repin_dict, leftclus, rightclus = {}, {}, {}
 repin_names = []
-move_tracker = []
 repins_per_genome = {}
 closest_repin_criteria = 500
 fast_mode_testin_only = False
 all_parameters = {}
 flank_gene_param = {}
 allreplength = []
+logging_mergers = []
+logging_repin_dict = []
 
 
 def progress_bar(current, total, bar_length=70):
@@ -80,7 +81,7 @@ def progress_bar(current, total, bar_length=70):
 
 
 def prepare_repin_dict(mixed_clusters):
-    global repin_dict, leftclus, rightclus, clusters
+    global repin_dict, leftclus, rightclus, clusters, logging_mergers, logging_repin_dict
     repin_dict = {rep: {'L': -1, 'R': -1} for rep in repin_names}
     inverse_repdict = {}
     leftclus = {}
@@ -107,6 +108,17 @@ def prepare_repin_dict(mixed_clusters):
         rightclus[key] = list(set(rightclus[key]))
 
     clusters = deepcopy(inverse_repdict)
+
+    for key, val in inverse_repdict.items():
+        if len(set(val)) > 1:
+            combval = '\n'.join(val)
+            logstring = f">{key[0]}_{key[1]} self\n{combval}"
+            logging_mergers.append(logstring)
+
+    logging_repin_dict = {}
+    for key, val in inverse_repdict.items():
+        for entry in val:
+            logging_repin_dict[entry] = key
 
 
 def nearby_repins(gen, posa, posb):
@@ -201,7 +213,7 @@ def setup():
 
 
 def flankclusterer():
-    global clusters
+    global clusters, logging_mergers
     progress_bar(allreplength * 1.05, allreplength * 1.1)
     # ---------------------Block Starts---------------------
     # Finding Middle Gene Deletion Cases
@@ -234,14 +246,18 @@ def flankclusterer():
                     continue
                 if len(rightclus[key2[1]]) > 1:
                     continue
-                move_tracker.append([key1, key2])
+                combval = "\n".join(clusters[key1] + clusters[key2])
+                logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]}\n{combval}"
+                logging_mergers.append(logstring)
                 to_merge.append((key1, key2))
             if key1[1] == key2[1] and key1[1] != -1:
                 if len(leftclus[key1[0]]) > 1:
                     continue
                 if len(leftclus[key2[0]]) > 1:
                     continue
-                move_tracker.append([key1, key2])
+                combval = "\n".join(clusters[key1] + clusters[key2])
+                logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]}\n{combval}"
+                logging_mergers.append(logstring)
                 to_merge.append((key1, key2))
 
     merge_graph = nx.Graph()
@@ -266,15 +282,24 @@ def flankclusterer():
 def print_out_clusters():
     progress_bar(allreplength * 1.1, allreplength * 1.1)
     if not os.path.isdir(all_parameters['out']):
-        os.system("mkdir {}".format(all_parameters['out'].replace(" ", "\ ")))
+        os.system("mkdir {}".format(all_parameters['out'].replace(" ", "\\ ")))
     outfile = open(f"{all_parameters['out']}/clusters_{todaysdate}.txt", "w")
+    meta_output = open(
+        f"{all_parameters['out']}/meta_cluster_{todaysdate}.txt", "w")
     for i in range(len(clusters)):
         for rep in clusters[i]:
             a = repins_with_1k_flanks[rep][0]
             b = repins_with_1k_flanks[rep][1]
             c = repins_with_1k_flanks[rep][3]
             outfile.write(f"{i} {a} {b} {c}\n")
+            kiss = logging_repin_dict[a]
+            meta_output.write(
+                f"{i} {a} leftflank_{kiss[0]} rightflank_{kiss[1]}\n")
     outfile.close()
+    meta_output.close()
+
+    with open(f"{all_parameters['out']}/path_making_{todaysdate}.txt", "w") as f:
+        f.write("\n".join(logging_mergers))
 
 
 def main():

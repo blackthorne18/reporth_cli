@@ -3,7 +3,10 @@ import os
 from Bio import SeqIO
 import pickle
 from mkclus import head_of_clustering
+import time
+import random
 
+todaysdate = time.strftime("%b%d") + "_" + str(random.random())[3:6]
 all_parameters = {}
 
 
@@ -31,11 +34,12 @@ def get_files_from_rarefan(rarefan_path, reptypes):
         repins = [i[1:] for i in repins]
         repins = [[j for j in i if len(j) > 0] for i in repins]
 
-        genname = gen.split("_")[0]
+        genname = "_".join(gen.split("_")[:-1])
         repintype = int(gen.split("_")[-1])
 
-        if repintype not in reptypes and reptypes is not None:
-            continue
+        if reptypes is not None:
+            if repintype not in reptypes:
+                continue
 
         if genname not in remove_repeats.keys():
             remove_repeats[genname] = {}
@@ -47,7 +51,7 @@ def get_files_from_rarefan(rarefan_path, reptypes):
             for rep in rname:
                 rep = rep.split("_")
                 newr = "{} {} {} type{} {}".format(
-                    gen.split("_")[0], rep[1], rep[2], repintype, rseq)
+                    genname, rep[1], rep[2], repintype, rseq)
 
                 keep = True
                 for rtype, val in remove_repeats[genname].items():
@@ -81,7 +85,8 @@ def quick_check_files(repin, genomes):
             try:
                 list(SeqIO.parse(genomes + "/" + gen, 'fasta'))[0]
             except Exception:
-                print(f"Ignoring {genomes}/{gen} - Not a fasta file")
+                if ".DS_Store" not in gen:
+                    print(f"Ignoring {genomes}/{gen} - Not a fasta file")
                 continue
 
             if gen.split(".")[0] not in existing_in_gens:
@@ -93,7 +98,7 @@ def quick_check_files(repin, genomes):
 @click.command()
 @click.option('--repin', prompt="Repin File or RAREFAN Dir", help='Path to file containing repin sequences or RAREFAN Output')
 @click.option('--genomes', prompt="Genomes Directory", help='Path to directory containing genomes')
-@click.option('--out', help="Output file destination", default='./cluster_output/')
+@click.option('--out', help="Output file destination", default='./cluster_output')
 @click.option('--win', help="Repin flanking window", default=250)
 @click.option('--fsize', help="Size of flanking region", default=1000)
 @click.option('--pident', help="Percentage sequence similarity", default=90)
@@ -108,7 +113,7 @@ def main(repin, genomes, out, win, fsize, pident, coverage, reptypes):
     all_parameters = {
         "repin": os.path.abspath(repin),
         "genomes": [],
-        "out": os.path.abspath(out),
+        "out": os.path.abspath(out) + f"_{todaysdate}/",
         "win": win,
         "fsize": fsize,
         "pident": pident,
