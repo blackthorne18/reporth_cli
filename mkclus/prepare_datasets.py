@@ -65,7 +65,7 @@ def setup_blastdb(bank_path):
         splitrep = rep.split()
         splitrep[1] = int(splitrep[1])
         splitrep[2] = int(splitrep[2])
-        repin_per_genome[gen].append(splitrep)
+        repin_per_genome[splitrep[0]].append(splitrep)
 
     for genome in genomes_list:
         sequence = str(SeqIO.read(genome, "fasta").seq)

@@ -5,6 +5,7 @@ import pickle
 from mkclus import head_of_clustering
 import time
 import random
+import re
 
 todaysdate = time.strftime("%b%d") + "_" + str(random.random())[3:6]
 all_parameters = {}
@@ -17,8 +18,10 @@ def get_files_from_rarefan(rarefan_path, reptypes):
 
     genomes = []
     for file in list(os.walk(rarefan_path))[0][1]:
-        if "_" in file:
-            genomes.append(file)
+        matches = re.finditer(r"(.*)_\d", file, re.MULTILINE)
+        matches = [match.group() for match in matches]
+        if len(matches) > 0:
+            genomes.append(matches[0])
 
     genomes.sort()
     allrepins = []
@@ -76,6 +79,7 @@ def quick_check_files(repin, genomes):
 
     existing_in_gens = list(
         set([x.split(" ")[0] for x in open(repin, "r").read().split("\n")]))
+
     if not os.path.isdir(genomes):
         print("Genome directory does not exist")
         exit("Exiting......")
@@ -88,11 +92,20 @@ def quick_check_files(repin, genomes):
                 if ".DS_Store" not in gen:
                     print(f"Ignoring {genomes}/{gen} - Not a fasta file")
                 continue
+            all_parameters["genomes"].append(gen)
 
-            if gen.split(".")[0] not in existing_in_gens:
+        for gen in existing_in_gens:
+            if f"{gen}.fasta" not in all_parameters["genomes"]:
                 exit(
                     f"Genome fasta file for {gen} not provided but REPINs from {gen} exist\nExisting Gens: {','.join(existing_in_gens)}")
-            all_parameters["genomes"].append(genomes + "/" + gen)
+
+        extraas = []
+        for gen in all_parameters["genomes"]:
+            if gen.split(".")[0] not in existing_in_gens:
+                extraas.append(gen)
+
+        all_parameters["genomes"] = [
+            f"{genomes}/{x}" for x in all_parameters["genomes"] if x not in extraas]
 
 
 @click.command()
