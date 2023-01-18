@@ -252,11 +252,11 @@ def flankclusterer():
             if key1[0] == key2[0] and key1[0] != -1:
                 if len(rightclus[key1[1]]) > 1:
                     logging_trans.append(
-                        f"{key1}_{key2}:TS:{rightclus[key1[1]]}")
+                        f"{key1}(R)_{key2}:TS:{rightclus[key2[1]]}")
                     continue
                 if len(rightclus[key2[1]]) > 1:
                     logging_trans.append(
-                        f"{key1}_{key2}:TS:{rightclus[key2[1]]}")
+                        f"{key1}_{key2}(R):TS:{rightclus[key2[1]]}")
                     continue
                 combval = "\n".join(clusters[key1] + clusters[key2])
                 logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]}\n{combval}"
@@ -265,12 +265,12 @@ def flankclusterer():
             if key1[1] == key2[1] and key1[1] != -1:
                 if len(leftclus[key1[0]]) > 1:
                     logging_trans.append(
-                        f"{key1}_{key2}:TS:{leftclus[key1[0]]}")
+                        f"{key1}(L)_{key2}:TS:{leftclus[key1[0]]}")
 
                     continue
                 if len(leftclus[key2[0]]) > 1:
                     logging_trans.append(
-                        f"{key1}_{key2}:TS:{leftclus[key2[0]]}")
+                        f"{key1}_{key2}(L):TS:{leftclus[key2[0]]}")
                     continue
                 combval = "\n".join(clusters[key1] + clusters[key2])
                 logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]}\n{combval}"
