@@ -2,9 +2,9 @@
 """
 Input Files Required:
 1.  repin_with_1k_flanks (from prepare_datasets.py)
-    Path = ./bank/repin_with_1k_flanks.p
+    Path = bank_path/repin_with_1k_flanks.p
 2.  blastgenomedb (from prepare_datasets.py)
-    Path = ./bank/genomes_blastdb/allgenomes
+    Path = bank_path/genomes_blastdb/allgenomes
 
 Output Files:
 1.  File with REPIN clusters
@@ -52,8 +52,8 @@ from itertools import combinations as itercomb
 from mkclus import prepare_datasets
 
 todaysdate = time.strftime("%b%d")
-genome_blastdb = "./bank/genomes_blastdb/allgenomes"
-temp_files = "./bank/dumpyard/"
+genome_blastdb = "genomes_blastdb/allgenomes"
+temp_files = "dumpyard/"
 
 genomes_list = []
 repins_with_1k_flanks = {}
@@ -68,6 +68,7 @@ flank_gene_param = {}
 allreplength = []
 logging_mergers = []
 logging_repin_dict = []
+logging_trans = []
 
 
 def progress_bar(current, total, bar_length=70):
@@ -149,7 +150,8 @@ def setup_flank_matches():
         progress_bar(int(len(mixed_clusters) / 2) + 1, allreplength * 1.1)
         repin = repins_with_1k_flanks[key]
         lhs = repin[2]
-        lhs_hits = prepare_datasets.search_blastdb(lhs, flank_gene_param)
+        lhs_hits = prepare_datasets.search_blastdb(
+            all_parameters['bank'], lhs, flank_gene_param)
         mixed_clusters.append([])
         for hit in lhs_hits:
             # hit[1] = hit[1][:3].lower() + hit[1][3:]
@@ -163,7 +165,8 @@ def setup_flank_matches():
                 mixed_clusters[-1].append([rep[0], switch_dir[rep[1]]])
 
         rhs = repin[4]
-        rhs_hits = prepare_datasets.search_blastdb(rhs, flank_gene_param)
+        rhs_hits = prepare_datasets.search_blastdb(
+            all_parameters['bank'], rhs, flank_gene_param)
         mixed_clusters.append([])
         for hit in rhs_hits:
             # hit[1] = hit[1][:3].lower() + hit[1][3:]
@@ -181,19 +184,22 @@ def setup_flank_matches():
     prepare_repin_dict(mixed_clusters)
 
 
-def setup():
+def setup(bank_path):
     global repins_with_1k_flanks, clusters, repin_names, repins_per_genome
     global all_parameters, genomes_list, flank_gene_param
-    global allreplength
+    global allreplength, temp_files, genome_blastdb
 
-    all_parameters = pickle.load(open("./bank/all_parameters.p", "rb"))
+    all_parameters = pickle.load(open(f"{bank_path}/all_parameters.p", "rb"))
+
+    temp_files = all_parameters['bank'] + temp_files
+    genome_blastdb = all_parameters['bank'] + genome_blastdb
 
     genomes_list = all_parameters['genomes']
     flank_gene_param = {
         'pident': all_parameters['pident'], 'lengthmatch': all_parameters['coverage']}
 
-    prepare_datasets.setup_blastdb()
-    rw1k_path = "./bank/repin_with_1k_flanks.p"
+    prepare_datasets.setup_blastdb(all_parameters['bank'])
+    rw1k_path = f"{all_parameters['bank']}/repin_with_1k_flanks.p"
     repins_with_1k_flanks = pickle.load(open(rw1k_path, "rb"))
     clusters = [key for key in repins_with_1k_flanks.keys()]
     repin_names = [key for key in repins_with_1k_flanks.keys()]
@@ -238,13 +244,19 @@ def flankclusterer():
             if key1 == key2:
                 continue
             if key1 in triad_cliques or key2 in triad_cliques:
+                logging_trans.append(f"{key1}_{key2}:Triad")
                 continue
             if (key1[1], key1[0]) in triad_cliques or (key2[1], key2[0]) in triad_cliques:
+                logging_trans.append(f"{key1}_{key2}:Triad")
                 continue
             if key1[0] == key2[0] and key1[0] != -1:
                 if len(rightclus[key1[1]]) > 1:
+                    logging_trans.append(
+                        f"{key1}_{key2}:TS:{rightclus[key1[1]]}")
                     continue
                 if len(rightclus[key2[1]]) > 1:
+                    logging_trans.append(
+                        f"{key1}_{key2}:TS:{rightclus[key2[1]]}")
                     continue
                 combval = "\n".join(clusters[key1] + clusters[key2])
                 logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]}\n{combval}"
@@ -252,8 +264,13 @@ def flankclusterer():
                 to_merge.append((key1, key2))
             if key1[1] == key2[1] and key1[1] != -1:
                 if len(leftclus[key1[0]]) > 1:
+                    logging_trans.append(
+                        f"{key1}_{key2}:TS:{leftclus[key1[0]]}")
+
                     continue
                 if len(leftclus[key2[0]]) > 1:
+                    logging_trans.append(
+                        f"{key1}_{key2}:TS:{leftclus[key2[0]]}")
                     continue
                 combval = "\n".join(clusters[key1] + clusters[key2])
                 logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]}\n{combval}"
@@ -281,8 +298,7 @@ def flankclusterer():
 
 def print_out_clusters():
     progress_bar(allreplength * 1.1, allreplength * 1.1)
-    if not os.path.isdir(all_parameters['out']):
-        os.system("mkdir {}".format(all_parameters['out'].replace(" ", "\\ ")))
+
     outfile = open(f"{all_parameters['out']}/clusters_{todaysdate}.txt", "w")
     meta_output = open(
         f"{all_parameters['out']}/meta_cluster_{todaysdate}.txt", "w")
@@ -301,9 +317,12 @@ def print_out_clusters():
     with open(f"{all_parameters['out']}/path_making_{todaysdate}.txt", "w") as f:
         f.write("\n".join(logging_mergers))
 
+    with open(f"{all_parameters['out']}/missed_hits_{todaysdate}.txt", "w") as f:
+        f.write("\n".join(logging_trans))
 
-def main():
-    setup()
+
+def main(bank_path):
+    setup(bank_path)
     flankclusterer()
     print_out_clusters()
 
@@ -320,5 +339,5 @@ if __name__ == "__main__":
         "coverage": 90
     }
     pickle.dump(input_params, open("./bank/all_parameters.p", "wb"))
-    main()
+    main(".")
     print("Runtime: {:.2}s".format(time.time() - st))

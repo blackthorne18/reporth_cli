@@ -8,9 +8,9 @@ Input Files Required:
 
 Output Files:
 1.  blastgenomedb
-    Path = ./bank/genomes_blastdb/
+    Path = bank_path/genomes_blastdb/
 2.  repin_with_1k_flanks
-    Path = ./bank/repin_with_1k_flanks.p
+    Path = bank_path/repin_with_1k_flanks.p
 
 setup_blastd()
     Creates the output files blastgenomedb and repin_with_1k_flanks
@@ -35,12 +35,18 @@ import pickle
 from Bio.Blast.Applications import NcbimakeblastdbCommandline
 from Bio.Blast.Applications import NcbiblastnCommandline
 
-blast_path = "./bank/genomes_blastdb/"
-temp_files = "./bank/dumpyard/"
-all_parameters_path = "./bank/all_parameters.p"
+blast_path = "/genomes_blastdb/"
+temp_files = "/dumpyard/"
+all_parameters_path = "/all_parameters.p"
 
 
-def setup_blastdb():
+def setup_blastdb(bank_path):
+    global blast_path, temp_files, all_parameters_path
+
+    blast_path = bank_path + blast_path
+    temp_files = bank_path + temp_files
+    all_parameters_path = bank_path + all_parameters_path
+
     all_parameters = pickle.load(open(all_parameters_path, "rb"))
     genomes_list = all_parameters['genomes']
 
@@ -56,13 +62,10 @@ def setup_blastdb():
                         for genome in genomes_list}
 
     for rep in repins:
-        gen = rep.split(" ")[0]
-        posa = int(rep.split(" ")[1])
-        posb = int(rep.split(" ")[2])
-        col = rep.split(" ")[3]
-        seq = rep.split(" ")[4]
-        rep = [gen, posa, posb, col, seq]
-        repin_per_genome[gen].append(rep)
+        splitrep = rep.split()
+        splitrep[1] = int(splitrep[1])
+        splitrep[2] = int(splitrep[2])
+        repin_per_genome[gen].append(splitrep)
 
     for genome in genomes_list:
         sequence = str(SeqIO.read(genome, "fasta").seq)
@@ -84,7 +87,7 @@ def setup_blastdb():
             genname, sequence))
 
     pickle.dump(repin_with_1k_flanks, open(
-        "./bank/repin_with_1k_flanks.p", "wb"))
+        f"{bank_path}/repin_with_1k_flanks.p", "wb"))
 
     genome_sequences = "\n".join(genome_sequences)
     open(blast_path + "allgenomes.fas", "w").write(genome_sequences)
@@ -99,7 +102,7 @@ def setup_blastdb():
     cline()
 
 
-def search_blastdb(sequence, flank_gene_param):
+def search_blastdb(bank_path, sequence, flank_gene_param):
     infile = temp_files + "test1_in.fas"
     outfile = temp_files + "test1_out.fas"
     open(infile, "w").write(">query_seq\n{}".format(sequence))

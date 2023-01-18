@@ -121,6 +121,12 @@ def main(repin, genomes, out, win, fsize, pident, coverage, reptypes):
         "reptypes": reptypes
     }
 
+    # File names cannot contain whitespaces
+    if " " in all_parameters['out'] or "\t" in all_parameters['out']:
+        exit("Filename / Filepath cannot contain whitespaces. Aborting program...")
+
+    all_parameters['bank'] = all_parameters['out'] + "bank/"
+
     all_parameters['repin'] = get_files_from_rarefan(
         all_parameters['repin'], all_parameters['reptypes'])
 
@@ -128,17 +134,19 @@ def main(repin, genomes, out, win, fsize, pident, coverage, reptypes):
     quick_check_files(all_parameters['repin'], os.path.abspath(genomes))
 
     # Make Temporary files
-    os.system("mkdir {}".format("./bank/"))
-    os.system("mkdir {}".format("./bank/dumpyard"))
-    os.system("mkdir {}".format("./bank/genomes_blastdb"))
+    if not os.path.isdir(all_parameters['out']):
+        os.system("mkdir {}".format(all_parameters['out']))
+    os.system("mkdir {}".format(f"{all_parameters['bank']}/"))
+    os.system("mkdir {}".format(f"{all_parameters['bank']}/dumpyard"))
+    os.system("mkdir {}".format(f"{all_parameters['bank']}/genomes_blastdb"))
     pickle.dump(all_parameters, open(
-        "./bank/all_parameters.p", "wb"))
+        f"{all_parameters['bank']}/all_parameters.p", "wb"))
 
     # Begin the main clustering program
-    head_of_clustering.main()
+    head_of_clustering.main(all_parameters['bank'])
 
     # Clear temp files after running program
-    os.system("rm -rf {}".format("./bank/"))
+    os.system("rm -rf {}".format(f"{all_parameters['bank']}/"))
 
 
 if __name__ == '__main__':
@@ -146,5 +154,5 @@ if __name__ == '__main__':
         main()
         print("Program Completed.")
     except Exception as e:
-        os.system("rm -rf ./bank")
+        os.system(f"rm -rf {all_parameters['out']}")
         exit(f"repinclusterer encountered an error:\n{e}\nExiting...")
