@@ -67,18 +67,21 @@ def get_files_from_rarefan(rarefan_path, reptypes):
 
     allrepins = "\n".join(allrepins)
     final_filename = rarefan_path + "/sortedrepins.txt"
-    open(final_filename, "w").write(allrepins)
+    with open(final_filename, "w") as f:
+        f.write(allrepins)
     return final_filename
 
 
 def quick_check_files(repin, genomes):
     if not os.path.isfile(repin):
-        print("File containing REPINs does not exist")
-        print("If you have RAREFAN output use the tag --withrarefan 1")
-        exit("Exiting......")
+        exit("File containing REPINs does not exist\nExiting......")
 
-    existing_in_gens = list(
-        set([x.split(" ")[0] for x in open(repin, "r").read().split("\n")]))
+    with open(repin, "r") as f:
+        existing_in_gens = f.read().split("\n")
+        existing_in_gens = [x.split()[0]
+                            for x in existing_in_gens if len(x.split()) > 0]
+
+    store_extensions = {}
 
     if not os.path.isdir(genomes):
         print("Genome directory does not exist")
@@ -92,20 +95,28 @@ def quick_check_files(repin, genomes):
                 if ".DS_Store" not in gen:
                     print(f"Ignoring {genomes}/{gen} - Not a fasta file")
                 continue
-            all_parameters["genomes"].append(gen)
+            filesplit = gen.split(".")
+            all_parameters["genomes"].append(filesplit[0])
+            store_extensions[filesplit[0]] = ".".join(filesplit[1:])
 
         for gen in existing_in_gens:
-            if f"{gen}.fasta" not in all_parameters["genomes"]:
+            if gen not in all_parameters["genomes"]:
                 exit(
                     f"Genome fasta file for {gen} not provided but REPINs from {gen} exist\nExisting Gens: {','.join(existing_in_gens)}")
 
         extraas = []
         for gen in all_parameters["genomes"]:
-            if gen.split(".")[0] not in existing_in_gens:
+            if gen not in existing_in_gens:
                 extraas.append(gen)
 
         all_parameters["genomes"] = [
-            f"{genomes}/{x}" for x in all_parameters["genomes"] if x not in extraas]
+            x for x in all_parameters["genomes"] if x not in extraas]
+
+        for pos, val in enumerate(all_parameters["genomes"]):
+            if len(store_extensions[val]) < 1:
+                all_parameters["genomes"][pos] = f"{genomes}/{val}"
+            else:
+                all_parameters["genomes"][pos] = f"{genomes}/{val}.{store_extensions[val]}"
 
 
 @click.command()
