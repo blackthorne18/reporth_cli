@@ -118,6 +118,14 @@ def quick_check_files(repin, genomes):
             else:
                 all_parameters["genomes"][pos] = f"{genomes}/{val}.{store_extensions[val]}"
 
+            store_genomes = list(SeqIO.parse(
+                all_parameters["genomes"][pos], "fasta"))
+            if len(store_genomes) > 1:
+                error_message = f"""The fasta file {gen} contains more than one sequence - Genome files should have a single fasta entry. Cannot proceed without this genome file.
+                The program is not designed to work with contigs.
+                Genome file is located at {genomes}/{gen}.\nExiting...."""
+                exit(error_message)
+
 
 @click.command()
 @click.option('--repin', prompt="Repin File or RAREFAN Dir", help='Path to file containing repin sequences or RAREFAN Output')

@@ -62,6 +62,8 @@ def setup_blastdb(bank_path):
                         for genome in genomes_list}
 
     for rep in repins:
+        if len(rep) < 1:
+            continue
         splitrep = rep.split()
         splitrep[1] = int(splitrep[1])
         splitrep[2] = int(splitrep[2])
