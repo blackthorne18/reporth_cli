@@ -104,16 +104,18 @@ def setup_blastdb(bank_path):
     cline()
 
 
-def search_blastdb(bank_path, sequence, flank_gene_param):
+def search_blastdb(bank_path, sequence_list, flank_gene_param):
     infile = temp_files + "test1_in.fas"
     outfile = temp_files + "test1_out.fas"
-    open(infile, "w").write(">query_seq\n{}".format(sequence))
+    with open(infile, "w+") as f:
+        for key, val in sequence_list.items():
+            f.write(f">{key}\n{val}\n")
 
-    cmd = f"blastn -query {infile} -db {blast_path+'allgenomes'} -out {outfile}"
-    cmd_format = "-outfmt '6 qseqid sseqid pident length sstart send'"
+    cmd_format = "6 qseqid sseqid pident length sstart send"
+    # cmd = f"blastn -query {infile} -db {blast_path+'allgenomes'} -out {outfile} -outfmt '{cmd_format}'"
 
     cline = NcbiblastnCommandline(query=infile, db=blast_path +
-                                  "allgenomes", out=outfile, outfmt='6 qseqid sseqid pident length sstart send')
+                                  "allgenomes", out=outfile, outfmt=cmd_format)
 
     # Using BLAST CLI
     # os.system(cmd + " " + cmd_format)
@@ -124,37 +126,43 @@ def search_blastdb(bank_path, sequence, flank_gene_param):
         outfile, "r").read().split("\n") if len(i) > 0]
     good_output = []
     for i in range(len(outfile)):
-        outfile[i] = [outfile[i][0], outfile[i][1]] + \
+        seq_name = outfile[i][0]
+        outfile[i] = [seq_name, outfile[i][1]] + \
             [int(float(x)) for x in outfile[i][2:]]
         lengthmatch = int(
-            100 * (abs(outfile[i][5] - outfile[i][4]) / len(sequence)))
+            100 * (abs(outfile[i][5] - outfile[i][4]) / len(sequence_list[seq_name])))
         pident = outfile[i][2]
         if lengthmatch >= flank_gene_param['lengthmatch'] and pident >= flank_gene_param['pident']:
             good_output.append(outfile[i])
 
-    # Makes sure that only one hit is recorded per genome and this hit is the highest hit
+    # Reformat output so that we have a key-value pair for each query and each hit
+    refmt = {}
+    for i in range(len(good_output)):
+        query_name = good_output[i][0]
+        if query_name not in refmt.keys():
+            refmt[query_name] = []
+        refmt[query_name].append(good_output[i])
 
+    # Makes sure that only one hit is recorded per genome and this hit is the highest hit
     seen_gens = {}
     to_keep = []
-    for i in range(len(good_output)):
-        gen = good_output[i][1]
-        if gen not in seen_gens.keys():
-            seen_gens[gen] = [0, 0]
-        if good_output[i][2] > seen_gens[gen][0] and good_output[i][3] > seen_gens[gen][1]:
-            to_keep.append(i)
-            seen_gens[gen] = [good_output[i][2], good_output[i][3]]
+    for key, gop in refmt.items():
+        for i in range(len(gop)):
+            gen = gop[i][1]
+            if gen not in seen_gens.keys():
+                seen_gens[gen] = [0, 0]
+            if gop[i][2] > seen_gens[gen][0] and gop[i][3] > seen_gens[gen][1]:
+                to_keep.append(i)
+                seen_gens[gen] = [gop[i][2], gop[i][3]]
 
-    good_output = [good_output[i]
-                   for i in range(len(good_output)) if i in to_keep]
+        gop = [gop[i] for i in range(len(gop)) if i in to_keep]
+        refmt[key] = gop
 
-    return good_output
+    return refmt
 
 
 def main():
-    # setup_blastdb()
-    test_seq = "TAGGAGCGAGCTTGCTCGCGATGGTCGTCAACGATAACGCGCCCAACCTGGGTGAATGCGCTGTCTTGACGTTTTTCGCGAGCAAGCTCGCTCCTA"
-    blast_out = search_blastdb(test_seq)
-    print(blast_out)
+    print("Why is this being run?")
 
 
 if __name__ == "__main__":

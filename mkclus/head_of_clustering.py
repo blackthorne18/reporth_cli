@@ -121,6 +121,8 @@ def prepare_repin_dict(mixed_clusters):
         for entry in val:
             logging_repin_dict[entry] = key
 
+    print("...data processed!", flush=True)
+
 
 def nearby_repins(gen, posa, posb):
     near_reps = []
@@ -146,41 +148,46 @@ def setup_flank_matches():
     global left_flank, right_flank, unique_id_cards
     mixed_clusters = []
     switch_dir = {'left': 'R', 'right': 'L'}
-    for key in repins_with_1k_flanks.keys():
-        progress_bar(int(len(mixed_clusters) / 2) + 1, allreplength * 1.1)
-        repin = repins_with_1k_flanks[key]
-        lhs = repin[2]
-        lhs_hits = prepare_datasets.search_blastdb(
-            all_parameters['bank'], lhs, flank_gene_param)
-        mixed_clusters.append([])
-        for hit in lhs_hits:
-            # hit[1] = hit[1][:3].lower() + hit[1][3:]
-            near_reps = nearby_repins(hit[1], hit[4], hit[5])
-            for rep in near_reps:
-                # ------------------------------
-                # DISCLAIMER
-                # Here, rep_left => the flanking region is the left flank of this repin
-                # Opposite of what is said in near_repins
-                # ------------------------------
-                mixed_clusters[-1].append([rep[0], switch_dir[rep[1]]])
+    left_flank_raw = {key.replace(
+        " ", "_"): repin[2] for key, repin in repins_with_1k_flanks.items()}
+    right_flank_raw = {key.replace(
+        " ", "_"): repin[4] for key, repin in repins_with_1k_flanks.items()}
+    lhs_hits = prepare_datasets.search_blastdb(
+        all_parameters['bank'], left_flank_raw, flank_gene_param)
+    rhs_hits = prepare_datasets.search_blastdb(
+        all_parameters['bank'], right_flank_raw, flank_gene_param)
+    for key, repin in repins_with_1k_flanks.items():
+        repname = key.replace(" ", "_")
 
-        rhs = repin[4]
-        rhs_hits = prepare_datasets.search_blastdb(
-            all_parameters['bank'], rhs, flank_gene_param)
-        mixed_clusters.append([])
-        for hit in rhs_hits:
-            # hit[1] = hit[1][:3].lower() + hit[1][3:]
-            near_reps = nearby_repins(hit[1], hit[4], hit[5])
-            for rep in near_reps:
-                # ------------------------------
-                # DISCLAIMER
-                # Here, rep_left => the flanking region is the left flank of this repin
-                # Opposite of what is said in near_repins
-                # ------------------------------
-                mixed_clusters[-1].append([rep[0], switch_dir[rep[1]]])
+        if repname in lhs_hits.keys():
+            mixed_clusters.append([])
+            for hit in lhs_hits[repname]:
+                # hit[1] = hit[1][:3].lower() + hit[1][3:]
+                near_reps = nearby_repins(hit[1], hit[4], hit[5])
+                for rep in near_reps:
+                    # ------------------------------
+                    # DISCLAIMER
+                    # Here, rep_left => the flanking region is the left flank of this repin
+                    # Opposite of what is said in near_repins
+                    # ------------------------------
+                    mixed_clusters[-1].append([rep[0], switch_dir[rep[1]]])
+
+        if repname in rhs_hits.keys():
+            mixed_clusters.append([])
+            for hit in rhs_hits[repname]:
+                # hit[1] = hit[1][:3].lower() + hit[1][3:]
+                near_reps = nearby_repins(hit[1], hit[4], hit[5])
+                for rep in near_reps:
+                    # ------------------------------
+                    # DISCLAIMER
+                    # Here, rep_left => the flanking region is the left flank of this repin
+                    # Opposite of what is said in near_repins
+                    # ------------------------------
+                    mixed_clusters[-1].append([rep[0], switch_dir[rep[1]]])
 
     pickle.dump(mixed_clusters, open(
         temp_files + f"mixed_clusters_{todaysdate}.p", 'wb'))
+    print("...sequence comparisons complete!", flush=True)
     prepare_repin_dict(mixed_clusters)
 
 
@@ -217,10 +224,12 @@ def setup(bank_path):
         mixed_clusters = pickle.load(open(mixclus_file, "rb"))
         prepare_repin_dict(mixed_clusters)
 
+    print("...initialising!", flush=True)
+
 
 def flankclusterer():
     global clusters, logging_mergers
-    progress_bar(allreplength * 1.05, allreplength * 1.1)
+    # progress_bar(allreplength * 1.05, allreplength * 1.1)
     # ---------------------Block Starts---------------------
     # Finding Middle Gene Deletion Cases
     flank_gene_pair = []
@@ -295,9 +304,11 @@ def flankclusterer():
 
     clusters = deepcopy(new_clusters)
 
+    print("...clusters formed!", flush=True)
+
 
 def print_out_clusters():
-    progress_bar(allreplength * 1.1, allreplength * 1.1)
+    # progress_bar(allreplength * 1.1, allreplength * 1.1)
 
     outfile = open(f"{all_parameters['out']}/clusters_{todaysdate}.txt", "w")
     meta_output = open(
@@ -320,11 +331,15 @@ def print_out_clusters():
     with open(f"{all_parameters['out']}/missed_hits_{todaysdate}.txt", "w") as f:
         f.write("\n".join(logging_trans))
 
+    print("...files stored to output directory!", flush=True)
+
 
 def main(bank_path):
+    st = time.time()
     setup(bank_path)
     flankclusterer()
     print_out_clusters()
+    print("Runtime: {:.2}s".format(time.time() - st))
 
 
 if __name__ == "__main__":
