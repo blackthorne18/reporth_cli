@@ -38,6 +38,12 @@ flankclusterer(clusters)
         Right flank of B = Right flank of A
             Left flank of B DOESNT match with any other cluster
 
+> Meta Output Vars
+
+flank_pairwise_dists stores pairwise distances between all flanking sequences
+Stored as: flank_pairwise_dists[repin1][repin2] = distance
+where distance = pident * coverage = (ex:) 0.98 * 900 = 882
+
 """
 # -------------------------------------------------------------------------------------------
 import os
@@ -69,6 +75,7 @@ allreplength = []
 logging_mergers = []
 logging_repin_dict = []
 logging_trans = []
+flank_pairwise_dists = {'L': {}, 'R': {}}
 
 
 def progress_bar(current, total, bar_length=70):
@@ -145,17 +152,17 @@ def nearby_repins(gen, posa, posb):
 
 
 def setup_flank_matches():
-    global left_flank, right_flank, unique_id_cards
+    global left_flank, right_flank, unique_id_cards, flank_pairwise_dists
     mixed_clusters = []
     switch_dir = {'left': 'R', 'right': 'L'}
-    left_flank_raw = {key.replace(
+    left_flank = {key.replace(
         " ", "_"): repin[2] for key, repin in repins_with_1k_flanks.items()}
-    right_flank_raw = {key.replace(
+    right_flank = {key.replace(
         " ", "_"): repin[4] for key, repin in repins_with_1k_flanks.items()}
     lhs_hits = prepare_datasets.search_blastdb(
-        all_parameters['bank'], left_flank_raw, flank_gene_param)
+        all_parameters['bank'], left_flank, flank_gene_param)
     rhs_hits = prepare_datasets.search_blastdb(
-        all_parameters['bank'], right_flank_raw, flank_gene_param)
+        all_parameters['bank'], right_flank, flank_gene_param)
     for key, repin in repins_with_1k_flanks.items():
         repname = key.replace(" ", "_")
 
@@ -172,6 +179,21 @@ def setup_flank_matches():
                     # ------------------------------
                     mixed_clusters[-1].append([rep[0], switch_dir[rep[1]]])
 
+                    # flank_pairwise_dists stores pairwise distances
+                    # between all flanking sequences
+                    hit[0] = hit[0].replace("_", " ")
+                    if hit[0] not in flank_pairwise_dists['L']:
+                        flank_pairwise_dists['L'][hit[0]] = {}
+                    if rep[0] not in flank_pairwise_dists['L']:
+                        flank_pairwise_dists['L'][rep[0]] = {}
+                    if hit[0] not in flank_pairwise_dists['L'][rep[0]]:
+                        flank_pairwise_dists['L'][rep[0]][hit[0]] = {}
+                    if rep[0] not in flank_pairwise_dists['L'][hit[0]]:
+                        flank_pairwise_dists['L'][hit[0]][rep[0]] = {}
+                    flank_pairwise_dists['L'][hit[0]][rep[0]] = hit[2] / 100
+                    flank_pairwise_dists['L'][rep[0]][hit[0]] = hit[2] / 100
+                    # End of Storing Meta Data
+
         if repname in rhs_hits.keys():
             mixed_clusters.append([])
             for hit in rhs_hits[repname]:
@@ -184,6 +206,21 @@ def setup_flank_matches():
                     # Opposite of what is said in near_repins
                     # ------------------------------
                     mixed_clusters[-1].append([rep[0], switch_dir[rep[1]]])
+
+                    # flank_pairwise_dists stores pairwise distances
+                    # between all flanking sequences
+                    hit[0] = hit[0].replace("_", " ")
+                    if hit[0] not in flank_pairwise_dists['R']:
+                        flank_pairwise_dists['R'][hit[0]] = {}
+                    if rep[0] not in flank_pairwise_dists['R']:
+                        flank_pairwise_dists['R'][rep[0]] = {}
+                    if hit[0] not in flank_pairwise_dists['R'][rep[0]]:
+                        flank_pairwise_dists['R'][rep[0]][hit[0]] = {}
+                    if rep[0] not in flank_pairwise_dists['R'][hit[0]]:
+                        flank_pairwise_dists['R'][hit[0]][rep[0]] = {}
+                    flank_pairwise_dists['R'][hit[0]][rep[0]] = hit[2] / 100
+                    flank_pairwise_dists['R'][rep[0]][hit[0]] = hit[2] / 100
+                    # End of Storing Meta Data
 
     pickle.dump(mixed_clusters, open(
         temp_files + f"mixed_clusters_{todaysdate}.p", 'wb'))
@@ -310,28 +347,46 @@ def flankclusterer():
 def print_out_clusters():
     # progress_bar(allreplength * 1.1, allreplength * 1.1)
 
-    outfile = open(f"{all_parameters['out']}/clusters_{todaysdate}.txt", "w")
-    meta_output = open(
-        f"{all_parameters['out']}/meta_cluster_{todaysdate}.txt", "w")
-    for i in range(len(clusters)):
-        for rep in clusters[i]:
-            a = repins_with_1k_flanks[rep][0]
-            b = repins_with_1k_flanks[rep][1]
-            c = repins_with_1k_flanks[rep][3]
-            outfile.write(f"{i} {a} {b} {c}\n")
-            kiss = logging_repin_dict[a]
-            meta_output.write(
-                f"{i} {a} leftflank_{kiss[0]} rightflank_{kiss[1]}\n")
-    outfile.close()
-    meta_output.close()
+    with open(f"{all_parameters['out']}/clusters_{todaysdate}.txt", "w") as f:
+        for i in range(len(clusters)):
+            for rep in clusters[i]:
+                a = repins_with_1k_flanks[rep][0]
+                b = repins_with_1k_flanks[rep][1]
+                c = repins_with_1k_flanks[rep][3]
+                f.write(f"{i} {a} {b} {c}\n")
 
-    with open(f"{all_parameters['out']}/path_making_{todaysdate}.txt", "w") as f:
-        f.write("\n".join(logging_mergers))
+    with open(f"{all_parameters['out']}/meta_cluster_{todaysdate}.txt", "w") as f:
+        for i in range(len(clusters)):
+            for rep1 in clusters[i]:
+                left_list, right_list = [], []
+                rep1 = rep1.replace("_", " ")
+                for rep2 in clusters[i]:
+                    rep2 = rep2.replace("_", " ")
+                    try:
 
-    with open(f"{all_parameters['out']}/missed_hits_{todaysdate}.txt", "w") as f:
-        f.write("\n".join(logging_trans))
+                        left_list.append(
+                            str(flank_pairwise_dists['L'][rep1][rep2]))
+                    except Exception:
+                        left_list.append('-1')
+                    try:
+                        right_list.append(
+                            str(flank_pairwise_dists['R'][rep1][rep2]))
+                    except Exception:
+                        right_list.append('-1')
+                left_list = " ".join(left_list)
+                right_list = " ".join(right_list)
+                a = repins_with_1k_flanks[rep1][0]
+                f.write(f"{i} {a}\nleft {left_list}\nright {right_list}\n")
+    pickle.dump(flank_pairwise_dists, open(
+        all_parameters['out'] + "/flank_pairwise_dists.p", "wb"))
+    # with open(f"{all_parameters['out']}/path_making_{todaysdate}.txt", "w") as f:
+    #     f.write("\n".join(logging_mergers))
 
-    print("...files stored to output directory!", flush=True)
+    # with open(f"{all_parameters['out']}/missed_hits_{todaysdate}.txt", "w") as f:
+    #     f.write("\n".join(logging_trans))
+
+    print(
+        f"...files stored in {os.path.relpath(all_parameters['out'])}!", flush=True)
 
 
 def main(bank_path):
@@ -339,7 +394,7 @@ def main(bank_path):
     setup(bank_path)
     flankclusterer()
     print_out_clusters()
-    print("Runtime: {:.2}s".format(time.time() - st))
+    print("Runtime: {:.4}s".format(time.time() - st))
 
 
 if __name__ == "__main__":
