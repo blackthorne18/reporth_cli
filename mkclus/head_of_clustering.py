@@ -90,6 +90,7 @@ def progress_bar(current, total, bar_length=70):
 
 def prepare_repin_dict(mixed_clusters):
     global repin_dict, leftclus, rightclus, clusters, logging_mergers, logging_repin_dict
+    print("\tProcessing Data...", flush=True)
     repin_dict = {rep: {'L': -1, 'R': -1} for rep in repin_names}
     inverse_repdict = {}
     leftclus = {}
@@ -128,8 +129,6 @@ def prepare_repin_dict(mixed_clusters):
         for entry in val:
             logging_repin_dict[entry] = key
 
-    print("...data processed!", flush=True)
-
 
 def nearby_repins(gen, posa, posb):
     near_reps = []
@@ -153,6 +152,7 @@ def nearby_repins(gen, posa, posb):
 
 def setup_flank_matches():
     global left_flank, right_flank, unique_id_cards, flank_pairwise_dists
+    print("\tComparing Sequences...", flush=True)
     mixed_clusters = []
     switch_dir = {'left': 'R', 'right': 'L'}
     left_flank = {key.replace(
@@ -181,7 +181,8 @@ def setup_flank_matches():
 
                     # flank_pairwise_dists stores pairwise distances
                     # between all flanking sequences
-                    # hit[0] = hit[0].replace("_", " ")
+                    hit[0] = hit[0].replace(" ", "_")
+                    rep[0] = rep[0].replace(" ", "_")
                     if hit[0] not in flank_pairwise_dists['L']:
                         flank_pairwise_dists['L'][hit[0]] = {}
                     if rep[0] not in flank_pairwise_dists['L']:
@@ -209,7 +210,8 @@ def setup_flank_matches():
 
                     # flank_pairwise_dists stores pairwise distances
                     # between all flanking sequences
-                    # hit[0] = hit[0].replace("_", " ")
+                    hit[0] = hit[0].replace(" ", "_")
+                    rep[0] = rep[0].replace(" ", "_")
                     if hit[0] not in flank_pairwise_dists['R']:
                         flank_pairwise_dists['R'][hit[0]] = {}
                     if rep[0] not in flank_pairwise_dists['R']:
@@ -224,7 +226,6 @@ def setup_flank_matches():
 
     pickle.dump(mixed_clusters, open(
         temp_files + f"mixed_clusters_{todaysdate}.p", 'wb'))
-    print("...sequence comparisons complete!", flush=True)
     prepare_repin_dict(mixed_clusters)
 
 
@@ -232,6 +233,8 @@ def setup(bank_path):
     global repins_with_1k_flanks, clusters, repin_names, repins_per_genome
     global all_parameters, genomes_list, flank_gene_param
     global allreplength, temp_files, genome_blastdb
+
+    print("\tInitialising...", flush=True)
 
     all_parameters = pickle.load(open(f"{bank_path}/all_parameters.p", "rb"))
 
@@ -261,11 +264,11 @@ def setup(bank_path):
         mixed_clusters = pickle.load(open(mixclus_file, "rb"))
         prepare_repin_dict(mixed_clusters)
 
-    print("...initialising!", flush=True)
-
 
 def flankclusterer():
     global clusters, logging_mergers
+
+    print("\tForming clusters...", flush=True)
     # progress_bar(allreplength * 1.05, allreplength * 1.1)
     # ---------------------Block Starts---------------------
     # Finding Middle Gene Deletion Cases
@@ -341,8 +344,6 @@ def flankclusterer():
 
     clusters = deepcopy(new_clusters)
 
-    print("...clusters formed!", flush=True)
-
 
 def print_out_clusters():
     # progress_bar(allreplength * 1.1, allreplength * 1.1)
@@ -363,7 +364,6 @@ def print_out_clusters():
                 for rep2 in clusters[i]:
                     rep4 = rep2.replace(" ", "_")
                     try:
-
                         left_list.append(
                             str(flank_pairwise_dists['L'][rep3][rep4]))
                     except Exception:
@@ -379,14 +379,15 @@ def print_out_clusters():
                 f.write(f"{i} {a}\nleft {left_list}\nright {right_list}\n")
     pickle.dump(flank_pairwise_dists, open(
         all_parameters['out'] + "/flank_pairwise_dists.p", "wb"))
-    # with open(f"{all_parameters['out']}/path_making_{todaysdate}.txt", "w") as f:
-    #     f.write("\n".join(logging_mergers))
 
-    # with open(f"{all_parameters['out']}/missed_hits_{todaysdate}.txt", "w") as f:
-    #     f.write("\n".join(logging_trans))
+    with open(f"{all_parameters['out']}/path_making_{todaysdate}.txt", "w") as f:
+        f.write("\n".join(logging_mergers))
+
+    with open(f"{all_parameters['out']}/missed_hits_{todaysdate}.txt", "w") as f:
+        f.write("\n".join(logging_trans))
 
     print(
-        f"...files stored in {os.path.relpath(all_parameters['out'])}!", flush=True)
+        f"\tFiles stored in {os.path.relpath(all_parameters['out'])}!", flush=True)
 
 
 def main(bank_path):
