@@ -181,7 +181,7 @@ def setup_flank_matches():
 
                     # flank_pairwise_dists stores pairwise distances
                     # between all flanking sequences
-                    hit[0] = hit[0].replace("_", " ")
+                    # hit[0] = hit[0].replace("_", " ")
                     if hit[0] not in flank_pairwise_dists['L']:
                         flank_pairwise_dists['L'][hit[0]] = {}
                     if rep[0] not in flank_pairwise_dists['L']:
@@ -209,7 +209,7 @@ def setup_flank_matches():
 
                     # flank_pairwise_dists stores pairwise distances
                     # between all flanking sequences
-                    hit[0] = hit[0].replace("_", " ")
+                    # hit[0] = hit[0].replace("_", " ")
                     if hit[0] not in flank_pairwise_dists['R']:
                         flank_pairwise_dists['R'][hit[0]] = {}
                     if rep[0] not in flank_pairwise_dists['R']:
@@ -359,18 +359,18 @@ def print_out_clusters():
         for i in range(len(clusters)):
             for rep1 in clusters[i]:
                 left_list, right_list = [], []
-                rep1 = rep1.replace("_", " ")
+                rep3 = rep1.replace(" ", "_")
                 for rep2 in clusters[i]:
-                    rep2 = rep2.replace("_", " ")
+                    rep4 = rep2.replace(" ", "_")
                     try:
 
                         left_list.append(
-                            str(flank_pairwise_dists['L'][rep1][rep2]))
+                            str(flank_pairwise_dists['L'][rep3][rep4]))
                     except Exception:
                         left_list.append('-1')
                     try:
                         right_list.append(
-                            str(flank_pairwise_dists['R'][rep1][rep2]))
+                            str(flank_pairwise_dists['R'][rep3][rep4]))
                     except Exception:
                         right_list.append('-1')
                 left_list = " ".join(left_list)
