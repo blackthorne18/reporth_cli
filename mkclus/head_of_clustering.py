@@ -366,12 +366,12 @@ def print_out_clusters():
                     try:
                         left_list.append(
                             str(flank_pairwise_dists['L'][rep3][rep4]))
-                    except Exception:
+                    except KeyError:
                         left_list.append('-1')
                     try:
                         right_list.append(
                             str(flank_pairwise_dists['R'][rep3][rep4]))
-                    except Exception:
+                    except KeyError:
                         right_list.append('-1')
                 left_list = " ".join(left_list)
                 right_list = " ".join(right_list)
