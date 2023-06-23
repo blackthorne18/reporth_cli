@@ -56,6 +56,7 @@ from itertools import combinations as itercomb
 # filepath = "/".join(__file__.split("/")[:-1])
 # os.chdir(filepath)
 from mkclus import prepare_datasets
+from mkclus import visualise_clusters
 
 todaysdate = time.strftime("%b%d")
 genome_blastdb = "genomes_blastdb/allgenomes"
@@ -388,6 +389,13 @@ def print_out_clusters():
 
     print(
         f"\tFiles stored in {os.path.relpath(all_parameters['out'])}!", flush=True)
+
+    # ------------------------------------------------------------------------------------------
+    # Visualisation of the clusters as histograms of cliques within clusters
+    metafilename = f"{all_parameters['out']}/meta_cluster_{todaysdate}.txt"
+    outpath = all_parameters['out']
+    visualise_clusters.mkclus_main(metafilename, outpath)
+    # ------------------------------------------------------------------------------------------
 
 
 def main(bank_path):

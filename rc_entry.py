@@ -128,16 +128,21 @@ def quick_check_files(repin, genomes):
 
 
 @click.command()
-@click.option('--repin', prompt="Repin File or RAREFAN Dir", help='Path to file containing repin sequences or RAREFAN Output')
-@click.option('--genomes', prompt="Genomes Directory", help='Path to directory containing genomes')
+@click.option('--repin', help='Path to file containing repin sequences or RAREFAN Output', default=None)
+@click.option('--genomes', help='Path to directory containing genomes', default=None)
+@click.option('--visualfile', help='Metafile produced by this program', default=None)
+@click.option('--visualtype', help='Cluster number to visualise cluster (or) -1 for Detailed Summary for Clique based (or) -1 for Detailed Summary for Connectivity based', default=None)
 @click.option('--out', help="Output file destination", default='./cluster_output')
 @click.option('--win', help="Repin flanking window", default=250)
 @click.option('--fsize', help="Size of flanking region", default=1000)
 @click.option('--pident', help="Percentage sequence similarity", default=90)
 @click.option('--coverage', help="Minimum length of alignment", default=90)
 @click.option('--reptypes', help="Mention the specific repin types to accept from rarefan output")
-def main(repin, genomes, out, win, fsize, pident, coverage, reptypes):
+def main(repin, genomes, visualfile, visualtype, out, win, fsize, pident, coverage, reptypes):
     global all_parameters
+
+    if repin is None and genomes is None and visualfile is None and visualtype is None:
+        exit("Appropriate parameters ")
 
     if reptypes is not None:
         reptypes = [int(x) for x in reptypes.split(",")]
