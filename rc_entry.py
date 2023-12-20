@@ -12,6 +12,7 @@ all_parameters = {}
 
 
 def get_files_from_rarefan(rarefan_path, reptypes):
+    MINREPINSIZE = 42
 
     if os.path.isfile(rarefan_path):
         return rarefan_path
@@ -55,12 +56,16 @@ def get_files_from_rarefan(rarefan_path, reptypes):
                 rep = rep.split("_")
                 newr = "{} {} {} type{} {}".format(
                     genname, rep[1], rep[2], repintype, rseq)
-
+                
                 keep = True
+                
+                # Check size of sequence to determine if it's a REP or REPIN
+                if abs(int(rep[1]) - int(rep[2])) <= MINREPINSIZE:
+                    keep = False
+                
                 for rtype, val in remove_repeats[genname].items():
                     if f"{rep[1]}_{rep[2]}" in val:
                         keep = False
-
                 remove_repeats[genname][repintype].append(f"{rep[1]}_{rep[2]}")
                 if keep:
                     allrepins.append(newr)
