@@ -122,7 +122,7 @@ def prepare_repin_dict(mixed_clusters):
     for key, val in inverse_repdict.items():
         if len(set(val)) > 1:
             combval = '\n'.join(val)
-            logstring = f">{key[0]}_{key[1]} self\n{combval}"
+            logstring = f">{key[0]}_{key[1]} both\n{combval}"
             logging_mergers.append(logstring)
 
     logging_repin_dict = {}
@@ -164,6 +164,12 @@ def setup_flank_matches():
         all_parameters['bank'], left_flank, flank_gene_param)
     rhs_hits = prepare_datasets.search_blastdb(
         all_parameters['bank'], right_flank, flank_gene_param)
+    # -------------------METHODS-PAPER----------------------------
+    # Storing the LHS and RHS hits to pickle file
+    pickle.dump(lhs_hits, open(f"{all_parameters['out']}/lhs_hits.p", "wb"))
+    pickle.dump(rhs_hits, open(f"{all_parameters['out']}/rhs_hits.p", "wb"))
+    store_nearby_reps = {'L': {}, 'R': {}}
+    # ------------------------------------------------------------
     for key, repin in repins_with_1k_flanks.items():
         repname = key.replace(" ", "_")
 
@@ -172,6 +178,9 @@ def setup_flank_matches():
             for hit in lhs_hits[repname]:
                 # hit[1] = hit[1][:3].lower() + hit[1][3:]
                 near_reps = nearby_repins(hit[1], hit[4], hit[5])
+                if repname not in store_nearby_reps['L']:
+                    store_nearby_reps['L'][repname] = {}
+                store_nearby_reps['L'][repname][hit[1]] = near_reps
                 for rep in near_reps:
                     # ------------------------------
                     # DISCLAIMER
@@ -180,7 +189,7 @@ def setup_flank_matches():
                     # ------------------------------
                     mixed_clusters[-1].append([rep[0], switch_dir[rep[1]]])
 
-                    # flank_pairwise_dists stores pairwise distances
+                    # flank_pairwise_dists stores pairwise distance
                     # between all flanking sequences
                     hit[0] = hit[0].replace(" ", "_")
                     rep[0] = rep[0].replace(" ", "_")
@@ -201,6 +210,9 @@ def setup_flank_matches():
             for hit in rhs_hits[repname]:
                 # hit[1] = hit[1][:3].lower() + hit[1][3:]
                 near_reps = nearby_repins(hit[1], hit[4], hit[5])
+                if repname not in store_nearby_reps['R']:
+                    store_nearby_reps['R'][repname] = {}
+                store_nearby_reps['R'][repname][hit[1]] = near_reps
                 for rep in near_reps:
                     # ------------------------------
                     # DISCLAIMER
@@ -224,6 +236,14 @@ def setup_flank_matches():
                     flank_pairwise_dists['R'][hit[0]][rep[0]] = hit[2] / 100
                     flank_pairwise_dists['R'][rep[0]][hit[0]] = hit[2] / 100
                     # End of Storing Meta Data
+
+    # -------------------METHODS-PAPER---------------------------------------
+    # Storing the sequence similarity between flanking sequences
+    pickle.dump(flank_pairwise_dists, open(
+        f"{all_parameters['out']}/flank_pairwise_dists.p", "wb"))
+    # Storing information on REPINs present close to flanking sequences
+    pickle.dump(store_nearby_reps, open(f"{all_parameters['out']}/store_nearby_reps.p", "wb"))
+    # -----------------------------------------------------------------------
 
     pickle.dump(mixed_clusters, open(
         temp_files + f"mixed_clusters_{todaysdate}.p", 'wb'))
@@ -309,7 +329,7 @@ def flankclusterer():
                         f"{key1}_{key2}(R):TS:{rightclus[key2[1]]}")
                     continue
                 combval = "\n".join(clusters[key1] + clusters[key2])
-                logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]}\n{combval}"
+                logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]} left\n{combval}"
                 logging_mergers.append(logstring)
                 to_merge.append((key1, key2))
             if key1[1] == key2[1] and key1[1] != -1:
@@ -323,9 +343,13 @@ def flankclusterer():
                         f"{key1}_{key2}(L):TS:{leftclus[key2[0]]}")
                     continue
                 combval = "\n".join(clusters[key1] + clusters[key2])
-                logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]}\n{combval}"
+                logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]} right\n{combval}"
                 logging_mergers.append(logstring)
                 to_merge.append((key1, key2))
+
+    ts_dictionary = {k: v[0] for k, v in clusters.items()}
+    pickle.dump(ts_dictionary, open(
+        f"{all_parameters['out']}/ts_dictionary_{todaysdate}.p", "wb"))
 
     merge_graph = nx.Graph()
     merge_graph.add_edges_from(to_merge)

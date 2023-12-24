@@ -12,7 +12,7 @@ all_parameters = {}
 
 
 def get_files_from_rarefan(rarefan_path, reptypes):
-    MINREPINSIZE = 42
+    MINREPINSIZE = 50
 
     if os.path.isfile(rarefan_path):
         return rarefan_path
