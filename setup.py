@@ -6,13 +6,13 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
     requirements = fh.read()
 
 setup(
-    name='repinclusterer',
-    version='0.7.0',
+    name='reporth',
+    version='0.8.0',
     author='Prajwal Bharadwaj',
     description='Cluster DNA Sequences based on orthology',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url='https://github.com/blackthorne18/repinclusterer_cli',
+    url='https://github.com/blackthorne18/reporth_cli',
     py_modules=['rc_entry', 'mkclus'],
     packages=find_packages(),
     install_requires=[requirements],

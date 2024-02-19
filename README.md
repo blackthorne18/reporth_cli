@@ -1,4 +1,4 @@
-# REPIN CLUSTERER
+# REPORTH
 
 ## List of Contents
 
@@ -13,7 +13,7 @@
 ## Installation
 The tool can be installed with the command:
 
-    pip install -i https://test.pypi.org/simple/ repinclusterer
+    pip install -i https://test.pypi.org/simple/ reporth
 
 ## Introduction
 repin_clusterer is a tool developed for the clustering of REPIN sequences based on their position in the genome. REPIN Sequences that are present in orthologous regions will be placed in the same cluster. The orthology is determined based on the similarity of the nucleotide sequence that flanks either side of the REPIN.
@@ -24,7 +24,7 @@ repin_clusterer is a tool developed for the clustering of REPIN sequences based 
 ## Using this tool
 The tool can be run with the command:
 
-    repinclusterer --repin all_repins.txt --genomes genomes/ --out output_dir --reptypes 1,2
+    reporth --repin all_repins.txt --genomes genomes/ --out output_dir --reptypes 1,2
   | Tag      |      Function      |      Default      |
 |:------------:|:-------------:|:-------------:|
   |repin|path to the text file containing REPIN sequences or RAREFAN Dir| None|
@@ -45,14 +45,14 @@ The tool can be run with the command:
 ## Example Dataset
 We have created an example dataset for you to understand how to use the software and for a demonstration.
 <br>Download the sample input dataset from the link below.
-<br>Install `repinclusterer` and run using the command as mentioned above.
+<br>Install `reporth` and run using the command as mentioned above.
 <br>The output will be stored in the `cluster_output_[date]_[run-id]` directory in the format as mentioned below.
-<br>[Download Test Dataset](https://github.com/blackthorne18/repinclusterer_cli/files/8309764/test_data.zip)
+<br>[Download Test Dataset](https://github.com/blackthorne18/reporth_cli/files/8309764/test_data.zip)
 
 ## Input Format
 ### RAREFAN Output
 When a RAREFAN output directory is provided as input REPORTH will go through the RAREFAN output folder and find all genomes directories ([genome]\_[x]/) where x is any digit signifying the type of REP. Using the ‘--reptype' tag, the range of x can be specified. Within these folders the locations listed in the files [genome]_[x].ss are parsed. 
-> repinclusterer --repin rarefan_output_dir --genomes genomes --reptypes 0,1,2
+> reporth --repin rarefan_output_dir --genomes genomes --reptypes 0,1,2
 
 ### List of REPINs as input
 The input files that are required are by software:
@@ -67,7 +67,7 @@ genome_name repin_start repin_end repin_type repin_sequence
 <br>Ex: `TAMOak81 1008421 1008530 type0<br>Pb-St2 1008000 1008123 type0` </li>
 <li>It is preferrable to provide the genome sequences in fasta format. </li>
 </ol>
-> repinclusterer --repin listofrepins.txt --genomes genomes --reptypes 0,1,2
+> reporth --repin listofrepins.txt --genomes genomes --reptypes 0,1,2
 
 ## Output Format
 The primary output file `clusters_[date].txt` is very similar to the input file with the addition of a number at the beginning of the link representing the cluster number.

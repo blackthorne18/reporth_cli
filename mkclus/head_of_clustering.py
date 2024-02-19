@@ -69,6 +69,7 @@ repin_dict, leftclus, rightclus = {}, {}, {}
 repin_names = []
 repins_per_genome = {}
 closest_repin_criteria = 500
+SAMEGEN_THRESHHOLD = 1000
 fast_mode_testin_only = False
 all_parameters = {}
 flank_gene_param = {}
@@ -286,6 +287,23 @@ def setup(bank_path):
         prepare_repin_dict(mixed_clusters)
 
 
+def samegencriteria(clus1, clus2):
+    donotmerge = False
+    for rep1 in clus1:
+        for rep2 in clus2:
+            gen1 = rep1.split(' ')[0]
+            gen2 = rep2.split(' ')[0]
+            if gen1 == gen2:
+                d1 = rep1.split(' ')
+                d1 = [int(d1[1]), int(d1[2])]
+                d2 = rep2.split(' ')
+                d2 = [int(d2[1]), int(d2[2])]
+                d12 = min(abs(d1[1]-d2[0]), abs(d2[1]-d1[0]))
+                if d12 > SAMEGEN_THRESHHOLD:
+                    donotmerge = True
+    return donotmerge
+
+
 def flankclusterer():
     global clusters, logging_mergers
 
@@ -328,6 +346,8 @@ def flankclusterer():
                     logging_trans.append(
                         f"{key1}_{key2}(R):TS:{rightclus[key2[1]]}")
                     continue
+                if samegencriteria(clusters[key1], clusters[key2]):
+                    continue
                 combval = "\n".join(clusters[key1] + clusters[key2])
                 logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]} left\n{combval}"
                 logging_mergers.append(logstring)
@@ -341,6 +361,8 @@ def flankclusterer():
                 if len(leftclus[key2[0]]) > 1:
                     logging_trans.append(
                         f"{key1}_{key2}(L):TS:{leftclus[key2[0]]}")
+                    continue
+                if samegencriteria(clusters[key1], clusters[key2]):
                     continue
                 combval = "\n".join(clusters[key1] + clusters[key2])
                 logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]} right\n{combval}"

@@ -12,7 +12,6 @@ all_parameters = {}
 
 
 def get_files_from_rarefan(rarefan_path, reptypes):
-    MINREPINSIZE = 50
 
     if os.path.isfile(rarefan_path):
         return rarefan_path
@@ -60,7 +59,7 @@ def get_files_from_rarefan(rarefan_path, reptypes):
                 keep = True
                 
                 # Check size of sequence to determine if it's a REP or REPIN
-                if abs(int(rep[1]) - int(rep[2])) <= MINREPINSIZE:
+                if abs(int(rep[1]) - int(rep[2])) <= all_parameters['MINREPINSIZE']:
                     keep = False
                 
                 for rtype, val in remove_repeats[genname].items():
@@ -143,7 +142,8 @@ def quick_check_files(repin, genomes):
 @click.option('--pident', help="Percentage sequence similarity", default=90)
 @click.option('--coverage', help="Minimum length of alignment", default=90)
 @click.option('--reptypes', help="Mention the specific repin types to accept from rarefan output")
-def main(repin, genomes, visualfile, visualtype, out, win, fsize, pident, coverage, reptypes):
+@click.option('--minrepinsize', help="To be used if REP singlets and doublets are to be considiered", default=50)
+def main(repin, genomes, visualfile, visualtype, out, win, fsize, pident, coverage, reptypes, minrepinsize):
     global all_parameters
 
     if repin is None and genomes is None and visualfile is None and visualtype is None:
@@ -160,7 +160,8 @@ def main(repin, genomes, visualfile, visualtype, out, win, fsize, pident, covera
         "fsize": fsize,
         "pident": pident,
         "coverage": coverage,
-        "reptypes": reptypes
+        "reptypes": reptypes,
+        "MINREPINSIZE": minrepinsize
     }
 
     # File names cannot contain whitespaces
@@ -197,4 +198,4 @@ if __name__ == '__main__':
         print("Program Completed.")
     except Exception as e:
         os.system(f"rm -rf {all_parameters['out']}")
-        exit(f"repinclusterer encountered an error:\n{e}\nExiting...")
+        exit(f"reporth encountered an error:\n{e}\nExiting...")
