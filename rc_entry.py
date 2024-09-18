@@ -125,10 +125,13 @@ def quick_check_files(repin, genomes):
             store_genomes = list(SeqIO.parse(
                 all_parameters["genomes"][pos], "fasta"))
             if len(store_genomes) > 1:
-                error_message = f"""The fasta file {gen} contains more than one sequence - Genome files should have a single fasta entry. Cannot proceed without this genome file.
-                The program is not designed to work with contigs.
-                Genome file is located at {genomes}/{gen}.\nExiting...."""
-                exit(error_message)
+                warning_message = f"""The fasta file {gen} contains more than one sequence - Genome files should have a single fasta entry. Proceeding by selecting only the first entry in the fasta file.
+                Note: The program is not designed to work with contigs.
+                Genome file is located at {genomes}/{gen}"""
+                newpath = all_parameters["bank"] + f"/{gen}_firstentry"
+                SeqIO.write(store_genomes[0], newpath, "fasta")
+                print(warning_message)
+
 
 
 @click.command()

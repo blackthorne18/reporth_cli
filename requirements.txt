@@ -1,5 +1,5 @@
-click
-biopython
-networkx
-Levenshtein
-numpy
+click>=8.1.3
+biopython>=1.79
+networkx>=2.8.8
+Levenshtein>=0.20.8
+numpy>=1.23.3

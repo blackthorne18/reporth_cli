@@ -7,7 +7,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name='reporth',
-    version='0.8.0',
+    version='0.9.0',
     author='Prajwal Bharadwaj',
     description='Cluster DNA Sequences based on orthology',
     long_description=long_description,
@@ -23,6 +23,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        repinclusterer=rc_entry:main
+        reporth=rc_entry:main
     '''
 )
