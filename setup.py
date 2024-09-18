@@ -7,7 +7,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name='reporth',
-    version='0.9.0',
+    version='2.1.1',
     author='Prajwal Bharadwaj',
     description='Cluster DNA Sequences based on orthology',
     long_description=long_description,

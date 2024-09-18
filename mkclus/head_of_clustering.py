@@ -168,7 +168,17 @@ def setup_flank_matches():
     # -------------------METHODS-PAPER----------------------------
     # Storing the LHS and RHS hits to pickle file
     pickle.dump(lhs_hits, open(f"{all_parameters['out']}/lhs_hits.p", "wb"))
+    lhs_file = []
+    for key, val in lhs_hits.items():
+        lhs_file.append(",".join([str(x) for x in val[0]]))
+    with open(f"{all_parameters['out']}/lhs_hits.csv", "w+") as f:
+        f.write("\n".join(lhs_file))
     pickle.dump(rhs_hits, open(f"{all_parameters['out']}/rhs_hits.p", "wb"))
+    rhs_file = []
+    for key, val in rhs_hits.items():
+        rhs_file.append(",".join([str(x) for x in val[0]]))
+    with open(f"{all_parameters['out']}/rhs_hits.csv", "w+") as f:
+        f.write("\n".join(rhs_file))
     store_nearby_reps = {'L': {}, 'R': {}}
     # ------------------------------------------------------------
     for key, repin in repins_with_1k_flanks.items():
@@ -240,6 +250,14 @@ def setup_flank_matches():
 
     # -------------------METHODS-PAPER---------------------------------------
     # Storing the sequence similarity between flanking sequences
+    fpd_file = []
+    lrswap = {"L": 'left', "R": 'right'}
+    for k0 in flank_pairwise_dists:
+        for k1, v1 in flank_pairwise_dists[k0].items():
+            for k2,v2 in v1.items():
+                fpd_file.append(",".join([lrswap[k0], k1, k2, str(v2)]))
+    with open(f"{all_parameters['out']}/flank_pairwise_dists.csv", "w+") as f:
+        f.write("\n".join(fpd_file))
     pickle.dump(flank_pairwise_dists, open(
         f"{all_parameters['out']}/flank_pairwise_dists.p", "wb"))
     # Storing information on REPINs present close to flanking sequences
