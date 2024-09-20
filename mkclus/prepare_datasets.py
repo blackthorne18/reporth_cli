@@ -93,15 +93,13 @@ def setup_blastdb(bank_path):
 
     genome_sequences = "\n".join(genome_sequences)
     open(blast_path + "allgenomes.fas", "w").write(genome_sequences)
-    cmd = f"makeblastdb -in {blast_path}allgenomes.fas -out {blast_path}allgenomes -dbtype nucl"
-
-    cline = NcbimakeblastdbCommandline(
-        dbtype="nucl", input_file=blast_path + "allgenomes.fas", out=blast_path + "allgenomes")
 
     # Using BLAST CLI
-    # os.system(cmd)
-    # Using Biopython
-    cline()
+    cmd = f"makeblastdb -in {blast_path}allgenomes.fas -out {blast_path}allgenomes -dbtype nucl"
+    os.system(cmd)
+    # DEPRACATED - Using Biopython
+    # cline = NcbimakeblastdbCommandline(dbtype="nucl", input_file=blast_path + "allgenomes.fas", out=blast_path + "allgenomes")
+    # cline()
 
 
 def search_blastdb(bank_path, sequence_list, flank_gene_param):
@@ -111,16 +109,13 @@ def search_blastdb(bank_path, sequence_list, flank_gene_param):
         for key, val in sequence_list.items():
             f.write(f">{key}\n{val}\n")
 
-    cmd_format = "6 qseqid sseqid pident length sstart send"
-    # cmd = f"blastn -query {infile} -db {blast_path+'allgenomes'} -out {outfile} -outfmt '{cmd_format}'"
-
-    cline = NcbiblastnCommandline(query=infile, db=blast_path +
-                                  "allgenomes", out=outfile, outfmt=cmd_format)
-
     # Using BLAST CLI
-    # os.system(cmd + " " + cmd_format)
-    # Using Biopython
-    cline()
+    cmd_format = "6 qseqid sseqid pident length sstart send"
+    cmd = f"blastn -query {infile} -db {blast_path+'allgenomes'} -out {outfile} -outfmt '{cmd_format}'"
+    os.system(cmd)
+    # DEPRACATED - Using Biopython
+    # cline = NcbiblastnCommandline(query=infile, db=blast_path "allgenomes", out=outfile, outfmt=cmd_format)
+    # cline()
 
     outfile = [i.split("\t") for i in open(
         outfile, "r").read().split("\n") if len(i) > 0]
