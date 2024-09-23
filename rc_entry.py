@@ -125,11 +125,11 @@ def quick_check_files(repin, genomes):
             store_genomes = list(SeqIO.parse(
                 all_parameters["genomes"][pos], "fasta"))
             if len(store_genomes) > 1:
-                warning_message = f"""The fasta file {gen} contains more than one sequence - Genome files should have a single fasta entry. Proceeding by selecting only the first entry in the fasta file.
-                Note: The program is not designed to work with contigs.
-                Genome file is located at {genomes}/{gen}"""
-                newpath = all_parameters["bank"] + f"/{gen}_firstentry"
+                warning_message = f"Genome {gen} is a multi-fasta - only first entry will be considered"
+                newpath = all_parameters["bank"] + f"/{gen}"
                 SeqIO.write(store_genomes[0], newpath, "fasta")
+                all_parameters['genomes'] = [x if f"{genomes}/{gen}" not in x else newpath for x in all_parameters['genomes']]
+                print(f"{genomes}/{gen}")
                 print(warning_message)
 
 
@@ -150,7 +150,7 @@ def main(repin, genomes, visualfile, visualtype, out, win, fsize, pident, covera
     global all_parameters
 
     if repin is None and genomes is None and visualfile is None and visualtype is None:
-        exit("Appropriate parameters ")
+        exit("Use Appropriate parameters")
 
     if reptypes is not None:
         reptypes = [int(x) for x in reptypes.split(",")]
@@ -171,7 +171,14 @@ def main(repin, genomes, visualfile, visualtype, out, win, fsize, pident, covera
     if " " in all_parameters['out'] or "\t" in all_parameters['out']:
         exit("Filename / Filepath cannot contain whitespaces. Aborting program...")
 
+
+    # Make Temporary files
     all_parameters['bank'] = all_parameters['out'] + "bank/"
+    if not os.path.isdir(all_parameters['out']):
+        os.system("mkdir {}".format(all_parameters['out']))
+    os.system("mkdir {}".format(f"{all_parameters['bank']}/"))
+    os.system("mkdir {}".format(f"{all_parameters['bank']}/dumpyard"))
+    os.system("mkdir {}".format(f"{all_parameters['bank']}/genomes_blastdb"))
 
     all_parameters['repin'] = get_files_from_rarefan(
         all_parameters['repin'], all_parameters['reptypes'])
@@ -179,16 +186,9 @@ def main(repin, genomes, visualfile, visualtype, out, win, fsize, pident, covera
     # Check validity of all files and genome files
     quick_check_files(all_parameters['repin'], os.path.abspath(genomes))
 
-    # Make Temporary files
-    if not os.path.isdir(all_parameters['out']):
-        os.system("mkdir {}".format(all_parameters['out']))
-    os.system("mkdir {}".format(f"{all_parameters['bank']}/"))
-    os.system("mkdir {}".format(f"{all_parameters['bank']}/dumpyard"))
-    os.system("mkdir {}".format(f"{all_parameters['bank']}/genomes_blastdb"))
+    # Begin the main clustering program
     pickle.dump(all_parameters, open(
         f"{all_parameters['bank']}/all_parameters.p", "wb"))
-
-    # Begin the main clustering program
     head_of_clustering.main(all_parameters['bank'])
 
     # Clear temp files after running program

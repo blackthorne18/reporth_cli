@@ -32,8 +32,8 @@ import os
 import time
 from Bio import SeqIO
 import pickle
-from Bio.Blast.Applications import NcbimakeblastdbCommandline
-from Bio.Blast.Applications import NcbiblastnCommandline
+# from Bio.Blast.Applications import NcbimakeblastdbCommandline
+# from Bio.Blast.Applications import NcbiblastnCommandline
 
 blast_path = "/genomes_blastdb/"
 temp_files = "/dumpyard/"
@@ -93,7 +93,7 @@ def setup_blastdb(bank_path):
 
     genome_sequences = "\n".join(genome_sequences)
     open(blast_path + "allgenomes.fas", "w").write(genome_sequences)
-
+    
     # Using BLAST CLI
     cmd = f"makeblastdb -in {blast_path}allgenomes.fas -out {blast_path}allgenomes -dbtype nucl"
     os.system(cmd)

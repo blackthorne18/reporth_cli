@@ -277,14 +277,12 @@ def setup(bank_path):
     print("\tInitialising...", flush=True)
 
     all_parameters = pickle.load(open(f"{bank_path}/all_parameters.p", "rb"))
-
     temp_files = all_parameters['bank'] + temp_files
     genome_blastdb = all_parameters['bank'] + genome_blastdb
 
     genomes_list = all_parameters['genomes']
     flank_gene_param = {
         'pident': all_parameters['pident'], 'lengthmatch': all_parameters['coverage']}
-
     prepare_datasets.setup_blastdb(all_parameters['bank'])
     rw1k_path = f"{all_parameters['bank']}/repin_with_1k_flanks.p"
     repins_with_1k_flanks = pickle.load(open(rw1k_path, "rb"))
@@ -295,7 +293,6 @@ def setup(bank_path):
     for key in clusters:
         gen = key.split(" ")[0]
         repins_per_genome[gen].append(key)
-
     allreplength = len(list(repins_with_1k_flanks.keys()))
     if not fast_mode_testin_only:
         setup_flank_matches()
