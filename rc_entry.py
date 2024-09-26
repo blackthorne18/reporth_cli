@@ -116,6 +116,7 @@ def quick_check_files(repin, genomes):
         all_parameters["genomes"] = [
             x for x in all_parameters["genomes"] if x not in extraas]
 
+        all_multi_fasta = []
         for pos, val in enumerate(all_parameters["genomes"]):
             if len(store_extensions[val]) < 1:
                 all_parameters["genomes"][pos] = f"{genomes}/{val}"
@@ -125,12 +126,14 @@ def quick_check_files(repin, genomes):
             store_genomes = list(SeqIO.parse(
                 all_parameters["genomes"][pos], "fasta"))
             if len(store_genomes) > 1:
+                gen = os.path.basename(all_parameters["genomes"][pos]).split(".")[0]
                 warning_message = f"Genome {gen} is a multi-fasta - only first entry will be considered"
                 newpath = all_parameters["bank"] + f"/{gen}"
                 SeqIO.write(store_genomes[0], newpath, "fasta")
                 all_parameters['genomes'] = [x if f"{genomes}/{gen}" not in x else newpath for x in all_parameters['genomes']]
-                print(f"{genomes}/{gen}")
-                print(warning_message)
+                all_multi_fasta.append(gen)
+        warning_message = f"The following genome(s) have multi-fasta entries. Only the first entry will be considered:{','.join(all_multi_fasta)}"
+        print(warning_message)
 
 
 
