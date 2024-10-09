@@ -123,7 +123,7 @@ def prepare_repin_dict(mixed_clusters):
     for key, val in inverse_repdict.items():
         if len(set(val)) > 1:
             combval = '\n'.join(val)
-            logstring = f">{key[0]}_{key[1]} both\n{combval}"
+            logstring = f">{key[0]}_{key[1]}\n{combval}"
             logging_mergers.append(logstring)
 
     logging_repin_dict = {}
@@ -167,17 +167,20 @@ def setup_flank_matches():
         all_parameters['bank'], right_flank, flank_gene_param)
     # -------------------METHODS-PAPER----------------------------
     # Storing the LHS and RHS hits to pickle file
-    pickle.dump(lhs_hits, open(f"{all_parameters['out']}/lhs_hits.p", "wb"))
+    # pickle.dump(lhs_hits, open(f"{all_parameters['out']}/lhs_hits.p", "wb"))
+    lr_headers = "query_flankingsequence,subject_genome,pident,coverage,subject_start,subject_end"
     lhs_file = []
     for key, val in lhs_hits.items():
         lhs_file.append(",".join([str(x) for x in val[0]]))
     with open(f"{all_parameters['out']}/lhs_hits.csv", "w+") as f:
+        lhs_file = [lr_headers] + lhs_file
         f.write("\n".join(lhs_file))
-    pickle.dump(rhs_hits, open(f"{all_parameters['out']}/rhs_hits.p", "wb"))
+    # pickle.dump(rhs_hits, open(f"{all_parameters['out']}/rhs_hits.p", "wb"))
     rhs_file = []
     for key, val in rhs_hits.items():
         rhs_file.append(",".join([str(x) for x in val[0]]))
     with open(f"{all_parameters['out']}/rhs_hits.csv", "w+") as f:
+        rhs_file = [lr_headers] + rhs_file
         f.write("\n".join(rhs_file))
     store_nearby_reps = {'L': {}, 'R': {}}
     # ------------------------------------------------------------
@@ -256,12 +259,12 @@ def setup_flank_matches():
         for k1, v1 in flank_pairwise_dists[k0].items():
             for k2,v2 in v1.items():
                 fpd_file.append(",".join([lrswap[k0], k1, k2, str(v2)]))
-    with open(f"{all_parameters['out']}/flank_pairwise_dists.csv", "w+") as f:
-        f.write("\n".join(fpd_file))
-    pickle.dump(flank_pairwise_dists, open(
-        f"{all_parameters['out']}/flank_pairwise_dists.p", "wb"))
+    # with open(f"{all_parameters['out']}/flank_pairwise_dists.csv", "w+") as f:
+    #     f.write("\n".join(fpd_file))
+    # pickle.dump(flank_pairwise_dists, open(
+    #     f"{all_parameters['out']}/flank_pairwise_dists.p", "wb"))
     # Storing information on REPINs present close to flanking sequences
-    pickle.dump(store_nearby_reps, open(f"{all_parameters['out']}/store_nearby_reps.p", "wb"))
+    # pickle.dump(store_nearby_reps, open(f"{all_parameters['out']}/store_nearby_reps.p", "wb"))
     # -----------------------------------------------------------------------
 
     pickle.dump(mixed_clusters, open(
@@ -364,7 +367,7 @@ def flankclusterer():
                 if samegencriteria(clusters[key1], clusters[key2]):
                     continue
                 combval = "\n".join(clusters[key1] + clusters[key2])
-                logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]} left\n{combval}"
+                logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]}\n{combval}"
                 logging_mergers.append(logstring)
                 to_merge.append((key1, key2))
             if key1[1] == key2[1] and key1[1] != -1:
@@ -380,13 +383,13 @@ def flankclusterer():
                 if samegencriteria(clusters[key1], clusters[key2]):
                     continue
                 combval = "\n".join(clusters[key1] + clusters[key2])
-                logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]} right\n{combval}"
+                logstring = f">{key1[0]}_{key1[1]} with {key2[0]}_{key2[1]}\n{combval}"
                 logging_mergers.append(logstring)
                 to_merge.append((key1, key2))
 
     ts_dictionary = {k: v[0] for k, v in clusters.items()}
-    pickle.dump(ts_dictionary, open(
-        f"{all_parameters['out']}/ts_dictionary_{todaysdate}.p", "wb"))
+    # pickle.dump(ts_dictionary, open(
+    #     f"{all_parameters['out']}/ts_dictionary_{todaysdate}.p", "wb"))
 
     merge_graph = nx.Graph()
     merge_graph.add_edges_from(to_merge)
@@ -439,14 +442,13 @@ def print_out_clusters():
                 right_list = " ".join(right_list)
                 a = repins_with_1k_flanks[rep1][0]
                 f.write(f"{i} {a}\nleft {left_list}\nright {right_list}\n")
-    pickle.dump(flank_pairwise_dists, open(
-        all_parameters['out'] + "/flank_pairwise_dists.p", "wb"))
+    # pickle.dump(flank_pairwise_dists, open(all_parameters['out'] + "/flank_pairwise_dists.p", "wb"))
 
     with open(f"{all_parameters['out']}/path_making_{todaysdate}.txt", "w") as f:
         f.write("\n".join(logging_mergers))
 
-    with open(f"{all_parameters['out']}/missed_hits_{todaysdate}.txt", "w") as f:
-        f.write("\n".join(logging_trans))
+    # with open(f"{all_parameters['out']}/missed_hits_{todaysdate}.txt", "w") as f:
+    #     f.write("\n".join(logging_trans))
 
     print(
         f"\tFiles stored in {os.path.relpath(all_parameters['out'])}!", flush=True)

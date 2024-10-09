@@ -49,7 +49,7 @@ We have created an example dataset for you to understand how to use the software
 <br>Download the sample input dataset from the link below.
 <br>Install `reporth` and run using the command as mentioned above.
 <br>The output will be stored in the `cluster_output_[date]_[run-id]` directory in the format as mentioned below.
-<br>[Download Test Dataset](https://github.com/blackthorne18/reporth_cli/files/8309764/test_data.zip)
+<br>[Download Test Dataset](https://github.com/blackthorne18/reporth_methods/blob/main/reporth_testdata.zip?raw=true)
 
 ## Input Format
 ### RAREFAN Output
