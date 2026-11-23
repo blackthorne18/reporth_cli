@@ -139,19 +139,13 @@ def search_blastdb(bank_path, sequence_list, flank_gene_param):
         refmt[query_name].append(good_output[i])
 
     # Makes sure that only one hit is recorded per genome and this hit is the highest hit
-    seen_gens = {}
-    to_keep = []
     for key, gop in refmt.items():
-        for i in range(len(gop)):
-            gen = gop[i][1]
-            if gen not in seen_gens.keys():
-                seen_gens[gen] = [0, 0]
-            if gop[i][2] > seen_gens[gen][0] and gop[i][3] > seen_gens[gen][1]:
-                to_keep.append(i)
-                seen_gens[gen] = [gop[i][2], gop[i][3]]
-
-        gop = [gop[i] for i in range(len(gop)) if i in to_keep]
-        refmt[key] = gop
+        best = {}
+        for h in gop:
+            gen = h[1]
+            if gen not in best or (h[2], h[3]) > (best[gen][2], best[gen][3]):
+                best[gen] = h
+        refmt[key] = list(best.values())
 
     return refmt
 
